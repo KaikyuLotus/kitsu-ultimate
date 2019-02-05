@@ -69,27 +69,18 @@ def parse_str_dummies(reply: str, infos) -> str:
 
 
 def parse_sections(reply: str, infos) -> str:
-    while True:
-        _logger.debug("Looking for dialog sections in reply")
-        match = re.search(r"\${(.*?)}", reply)
-
-        if not match:
-            _logger.debug("No dialog sections found")
-            break
-
-        section = match.group(1)
+    for section in re.findall(r"\${(.*?)}", reply):
         _logger.debug(f"Section '{section}' found")
-        dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id,
-                                                         section)
+        dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
 
         if not dialogs:
             sub = "-"
-            _logger.debug("No dialogs found for section")
+            _logger.debug(f"No dialogs found for section '{section}'")
         else:
             sub = choice(dialogs).reply
 
         reply = re.sub(r"\${(.*?)}", sub, reply, count=1)
-        _logger.debug("Substitution done")
+        _logger.debug(f"Substitution of section '{section}' done")
 
     return reply
 
