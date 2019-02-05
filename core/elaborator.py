@@ -14,9 +14,9 @@ from utils import regex_utils
 _logger = log.get_logger("elaborator")
 
 _commands = {
-    "bid":   functions.bid,
+    "bid": functions.bid,
     "start": functions.start,
-    "uid":   functions.uid
+    "uid": functions.uid
 }
 
 _owner_commands = {
@@ -25,7 +25,7 @@ _owner_commands = {
 
 _maker_commands = {
     "newbot": maker_functions.newbot,
-    "myid":   maker_functions.myid
+    "myid": maker_functions.myid
 }
 
 _maker_master_commands = {
@@ -36,7 +36,7 @@ _maker_master_commands = {
 def complete_dialog(infos: Infos, dialog_section: str):
     _logger.debug(f"Elaborating reply of section {dialog_section}")
     dialogs: List[Dialog] = mongo_interface.get_dialogs_of_section(
-            infos.bot.bot_id, dialog_section)
+        infos.bot.bot_id, dialog_section)
 
     if not dialogs:
         _logger.debug(f"No dialogs set for section {dialog_section}")
@@ -81,10 +81,10 @@ def elaborate_eteraction(infos: Infos, eteraction: Trigger):
 
 
 t_type_elaborators = {
-    "equal":       elaborate_equal,
-    "content":     elaborate_content,
+    "equal": elaborate_equal,
+    "content": elaborate_content,
     "interaction": elaborate_interaction,
-    "eteraction":  elaborate_eteraction
+    "eteraction": elaborate_eteraction
 }
 
 
@@ -130,6 +130,7 @@ def maker_command(infos: Infos):
                       f"command {infos.message.command}")
         _maker_commands[infos.message.command](infos)
         return True
+
     return False
 
 

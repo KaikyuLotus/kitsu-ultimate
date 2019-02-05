@@ -13,30 +13,30 @@ string_dummies = {
 }
 
 dummies = {
-    "$base":     {
-        "{name}":               "infos.user.name",
-        "{uid}":                "infos.user.uid",
-        "{last_name}":          "infos.user.surname",
-        "{username}":           "infos.user.username",
-        "{bot.id}":             "infos.bot.bot_id",
-        "{bot.name}":           "infos.bot.name",
-        "{bot.username}":       "infos.bot.username",
-        "{bots_count}":         "manager.get_bots_count()",
-        "{exec_time}":          "ping(infos)",
-        "{triggers.count}":     "'unimplemented'",
-        "{dialogs.count}":      "'unimplemented'",
-        "{equals.count}":       "'unimplemented'",
-        "{contents.count}":     "'unimplemented'",
+    "$base": {
+        "{name}": "infos.user.name",
+        "{uid}": "infos.user.uid",
+        "{last_name}": "infos.user.surname",
+        "{username}": "infos.user.username",
+        "{bot.id}": "infos.bot.bot_id",
+        "{bot.name}": "infos.bot.name",
+        "{bot.username}": "infos.bot.username",
+        "{bots_count}": "manager.get_bots_count()",
+        "{exec_time}": "ping(infos)",
+        "{triggers.count}": "'unimplemented'",
+        "{dialogs.count}": "'unimplemented'",
+        "{equals.count}": "'unimplemented'",
+        "{contents.count}": "'unimplemented'",
         "{interactions.count}": "'unimplemented'",
-        "{eteractions.count}":  "'unimplemented'"
+        "{eteractions.count}": "'unimplemented'"
     },
 
     "$on_reply": {
-        "{to_name}":     "infos.to_user.name",
-        "{to_uid}":      "infos.to_user.uid",
-        "{to_surname}":  "infos.to_user.surname",
+        "{to_name}": "infos.to_user.name",
+        "{to_uid}": "infos.to_user.uid",
+        "{to_surname}": "infos.to_user.surname",
         "{to_username}": "infos.to_user.username",
-        "{is_bot}":      "infos.to_user.is_bot"
+        "{is_bot}": "infos.to_user.is_bot"
     }
 }
 
