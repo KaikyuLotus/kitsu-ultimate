@@ -1,16 +1,7 @@
-
-core/__pycache__/
-
-core/functions/__pycache__/
-
-core/functions/menu/__pycache__/
-
-utils/__pycache__/
-
-exceptions/__pycache__/
-
-logger/__pycache__/
-
 *.pyc
 
 nohup\.out
+
+\.idea/
+
+logger/log\.txt
