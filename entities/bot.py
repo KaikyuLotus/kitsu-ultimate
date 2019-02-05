@@ -64,7 +64,7 @@ class Bot:
             self.waiting_data = {}
 
         if infos.user and not infos.message.is_command:
-            if infos.user.is_bot_owner and infos.chat.is_private and self._callback:
+            if infos.user.is_bot_owner and self._callback:
                 _logger.debug(f"Calling callback {self._callback.__name__}")
                 self._callback = self._callback(infos)
                 return
