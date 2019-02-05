@@ -14,10 +14,10 @@ string_dummies = {
 
 dummies = {
     "$base": {
-        "{name}": "infos.user.name",
-        "{uid}": "infos.user.uid",
-        "{last_name}": "infos.user.surname",
-        "{username}": "infos.user.username",
+        "{user.name}": "infos.user.name",
+        "{user.id}": "infos.user.uid",
+        "{user.last_name}": "infos.user.surname",
+        "{user.username}": "infos.user.username",
         "{bot.id}": "infos.bot.bot_id",
         "{bot.name}": "infos.bot.name",
         "{bot.username}": "infos.bot.username",
