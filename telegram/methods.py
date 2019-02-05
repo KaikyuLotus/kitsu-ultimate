@@ -2,6 +2,7 @@ import json
 
 import requests
 
+from exceptions.conflict import Conflict
 from exceptions.bad_request import BadRequest
 from exceptions.forbidden import Forbidden
 from exceptions.not_found import NotFound
@@ -23,6 +24,9 @@ def execute(token: str, method: str, params: dict = None):
             error,
             [key for key in params],
             [params[key] for key in params]]
+
+    if status_code == 409:
+        raise Conflict(*args)
 
     if status_code == 404:
         raise NotFound(*args)

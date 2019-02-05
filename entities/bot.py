@@ -4,6 +4,7 @@ import traceback
 from core import elaborator, reply_parser, core
 from core.lowlevel import mongo_interface
 from entities.infos import Infos
+from exceptions.conflict import Conflict
 from exceptions.unauthorized import Unauthorized
 from logger import log
 from telegram import methods
@@ -110,8 +111,11 @@ class Bot:
                                  f"took {elapsed_time} ms")
 
         except Unauthorized:
-            print("Unauthorized bot, detaching...")
-            core.detach_bot(str(self))
+            _logger.error(f"Unauthorized bot {self.bot_id}, detaching...")
+            core.detach_bot(self.token)
+        except Conflict:
+            _logger.error(f"Telegram said that bot {self.bot_id} is already running, detaching...")
+            core.detach_bot(self.token)
         except Exception as e:
             print(e)
             traceback.print_tb(e.__traceback__)
