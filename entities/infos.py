@@ -1,3 +1,4 @@
+import re
 import time
 from typing import Dict
 
@@ -182,20 +183,15 @@ class Message:
         self.is_command = False
         self.command = None
         self.is_at_bot = False
+
         if self.is_text:  # TODO set right regex
-            self.is_command: bool = self.text.startswith("/")
-            args = self.text.split(" ")
-            self.command: str = args[0].replace("/", "")
-            splitted = self.command.split("@")
-            if len(splitted) > 1:
-                self.command = splitted[0]  # Maybe a regex could be better
-                self.is_at_bot = splitted[1].lower() == bot.username.lower()
-
-                # Use a setting to change this condition
-                if not self.is_at_bot:
-                    self.is_command = False
-
-            self.args: list = args[1::]
+            match = re.fullmatch(rf"^/(\w+)(@({bot.username}))?( +(.+))?", self.text, re.I)
+            if match:
+                self.is_command = True
+                self.is_at_bot = True
+                self.command = match.group(1)
+                if match.group(5):
+                    self.args = match.group(5).split()
 
         if self.text:
             self.what = "text"
