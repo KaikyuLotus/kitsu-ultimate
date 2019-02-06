@@ -14,13 +14,20 @@ from logger import log
 from telegram import methods
 
 # TODO make a config file
-from utils import configuration
+from configuration import configuration
 
 _logger = log.get_logger("mongo_interface")
 
-_db = configuration.get_current_env()
-_logger.info(f"Using environment {_db}")
-_mongo_uri = "mongodb://kaikyu:lotus@35.246.240.193/test?retryWrites=true&authSource=admin"
+# _db = configuration.get_current_env()
+# _logger.info(f"Using environment {_db}")
+_logger.info("Getting data from configuration file")
+_config = configuration.get_configuration("resources/config.properties")
+_password = _config.get("mongo.password")
+_username = _config.get("mongo.username")
+_ip = _config.get("mongo.ip")
+_db_name = _config.get("mongo.db_name")
+
+_mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=true&authSource=admin"
 
 _client = None
 _singleton_lock = Lock()
@@ -39,7 +46,7 @@ def stop():
     _get_client().close()
 
 
-def _get_db(): return getattr(_get_client(), _db)
+def _get_db(): return getattr(_get_client(), _db_name)
 
 
 def _get_bots_collection():
@@ -77,7 +84,7 @@ def _get_bot_collection(bot_id: int) -> Collection:
 
 def is_registered(token: str):
     return _get_bots_collection().find_one(
-            {"token": str(token)}).count() is not 0
+        {"token": str(token)}).count() is not 0
 
 
 def get_bot_data(token: str):
@@ -92,18 +99,18 @@ def register_bot(token: str, owner_id: int):
         return None
 
     _get_bots_collection().insert_one({
-        "token":       token,
-        "owner_id":    owner_id,
+        "token": token,
+        "owner_id": owner_id,
         # TODO make a method to change the start mode
         "clean_start": True,
         # TODO implement languages
-        "language":    "IT"
+        "language": "IT"
     })
 
 
 def get_dialogs_of_section(bot_id: int, section: str) -> List[Dialog]:
     return [Dialog.from_json(dialog) for dialog in _get_db().dialogs.find({
-        "bot_id":  bot_id,
+        "bot_id": bot_id,
         "section": section
     })]
 
@@ -111,13 +118,13 @@ def get_dialogs_of_section(bot_id: int, section: str) -> List[Dialog]:
 def get_triggers_of_type(bot_id: int, t_type: str) -> List[Trigger]:
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
         "bot_id": bot_id,
-        "type":   t_type
+        "type": t_type
     })]
 
 
 def get_triggers_of_section(bot_id: int, section: str) -> List[Trigger]:
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
-        "bot_id":  bot_id,
+        "bot_id": bot_id,
         "section": section
     })]
 
@@ -125,8 +132,8 @@ def get_triggers_of_section(bot_id: int, section: str) -> List[Trigger]:
 def get_triggers_of_type_and_section(bot_id: int, t_type: str, section: str) \
         -> List[Trigger]:
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
-        "bot_id":  bot_id,
-        "type":    t_type,
+        "bot_id": bot_id,
+        "type": t_type,
         "section": section
     })]
 
