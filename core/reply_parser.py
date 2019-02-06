@@ -52,7 +52,7 @@ def parse_dummies(reply: str, infos) -> str:
                 continue
 
         for dummy in dummies[dummy_t]:
-            if dummy in reply:
+            if dummy in reply:  # eval is dangerous but here is totally controlled
                 reply = reply.replace(dummy, str(eval(dummies[dummy_t][dummy])))
 
     return reply
