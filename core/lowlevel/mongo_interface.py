@@ -16,12 +16,10 @@ from telegram import methods
 # TODO make a config file
 from configuration import configuration
 
-_logger = log.get_logger("mongo_interface")
-
 # _db = configuration.get_current_env()
 # _logger.info(f"Using environment {_db}")
-_logger.info("Getting data from configuration file")
-_config = configuration.get_configuration("resources/config.properties")
+log.i("Getting data from configuration file")
+_config = configuration.default()
 _password = _config.get("mongo.password")
 _username = _config.get("mongo.username")
 _ip = _config.get("mongo.ip")

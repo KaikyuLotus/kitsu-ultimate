@@ -2,6 +2,7 @@ import os
 
 from configuration import config_parser
 
+_default_config_file_name = "resources/config.properties"
 _env_variable = "ENVIRONMENT"  # TODO read from env
 _default_env = "prod"
 _configs = {}
@@ -25,3 +26,7 @@ def get_configuration(file_name) -> Configuration:
     if file_name not in _configs:
         _configs[file_name] = Configuration(file_name)
     return _configs[file_name]
+
+
+def default():
+    return get_configuration(_default_config_file_name)

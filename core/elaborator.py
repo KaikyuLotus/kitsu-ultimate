@@ -11,8 +11,6 @@ from entities.trigger import Trigger
 from logger import log
 from utils import regex_utils
 
-_logger = log.get_logger("elaborator")
-
 _commands = {
     "bid": functions.bid,
     "start": functions.start,
@@ -34,17 +32,17 @@ _maker_master_commands = {
 
 
 def complete_dialog(infos: Infos, dialog_section: str):
-    _logger.debug(f"Elaborating reply of section {dialog_section}")
+    log.d(f"Elaborating reply of section {dialog_section}")
     dialogs: List[Dialog] = mongo_interface.get_dialogs_of_section(
         infos.bot.bot_id, dialog_section)
 
     if not dialogs:
-        _logger.debug(f"No dialogs set for section {dialog_section}")
+        log.d(f"No dialogs set for section {dialog_section}")
         return
 
     dialog = choice(dialogs)
     infos.reply(dialog.reply, parse_mode=None)
-    _logger.debug("Replied")
+    log.d("Replied")
     return True
 
 
@@ -73,10 +71,10 @@ def elaborate_eteraction(infos: Infos, eteraction: Trigger):
     is_inter = regex_utils.is_interaction(infos.message.text,
                                           infos.bot.regexed_name)
     if is_inter and infos.is_reply:
-        _logger.debug("Message is a reply and starts/ends with bot's name")
-        _logger.debug(f"Checking trigger {eteraction.trigger}")
+        log.d("Message is a reply and starts/ends with bot's name")
+        log.d(f"Checking trigger {eteraction.trigger}")
         if regex_utils.is_in_message(infos.message.text, eteraction.trigger):
-            _logger.debug("Trigger is present in text")
+            log.d("Trigger is present in text")
             return complete_dialog(infos, eteraction.section)
 
 
@@ -102,7 +100,7 @@ def elaborate(infos: Infos):
 
 def command(infos: Infos):
     if infos.message.command in _commands:
-        _logger.debug(f"User issued command {infos.message.command}")
+        log.d(f"User issued command {infos.message.command}")
         _commands[infos.message.command](infos)
         return True
 
@@ -114,7 +112,7 @@ def owner_command(infos: Infos):
         return False
 
     if infos.message.command in _owner_commands:
-        _logger.debug(f"Owner issued command {infos.message.command}")
+        log.d(f"Owner issued command {infos.message.command}")
         _owner_commands[infos.message.command](infos)
         return True
 
@@ -126,8 +124,8 @@ def maker_command(infos: Infos):
         return
 
     if infos.message.command in _maker_commands:
-        _logger.debug(f"{infos.user.uid} issued maker "
-                      f"command {infos.message.command}")
+        log.d(f"{infos.user.uid} issued maker "
+              f"command {infos.message.command}")
         _maker_commands[infos.message.command](infos)
         return True
 
@@ -139,7 +137,7 @@ def maker_master_command(infos: Infos):
         return
 
     if infos.message.command in _maker_master_commands:
-        _logger.debug(f"Maker owner issued command {infos.message.command}")
+        log.d(f"Maker owner issued command {infos.message.command}")
         _maker_master_commands[infos.message.command](infos)
         return True
     return False

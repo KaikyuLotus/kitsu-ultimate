@@ -6,8 +6,6 @@ from random import choice
 from core.lowlevel import mongo_interface
 from logger import log
 
-_logger = log.get_logger("reply_parser")
-
 string_dummies = {
     "[_]": "\n"
 }
@@ -70,17 +68,17 @@ def parse_str_dummies(reply: str, infos) -> str:
 
 def parse_sections(reply: str, infos) -> str:
     for section in re.findall(r"\${(.*?)}", reply):
-        _logger.debug(f"Section '{section}' found")
+        log.d(f"Section '{section}' found")
         dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
 
         if not dialogs:
             sub = "-"
-            _logger.debug(f"No dialogs found for section '{section}'")
+            log.d(f"No dialogs found for section '{section}'")
         else:
             sub = choice(dialogs).reply
 
         reply = re.sub(r"\${(.*?)}", sub, reply, count=1)
-        _logger.debug(f"Substitution of section '{section}' done")
+        log.d(f"Substitution of section '{section}' done")
 
     return reply
 

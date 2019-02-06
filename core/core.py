@@ -15,8 +15,6 @@ _attached_bots = []
 _main_bot = None
 _running = False
 
-_logger = log.get_logger("core")
-
 
 def get_maker_bot():
     global _main_bot
@@ -36,7 +34,7 @@ def get_maker_bot():
 def _init(bot):
     if bot.clean_start:
         methods.clean_updates(bot)
-    _logger.info(f"Bot @{bot.username} ok")
+    log.i(f"Bot @{bot.username} ok")
 
 
 def _run_bot(bot: Bot):
@@ -47,14 +45,14 @@ def _run_bot(bot: Bot):
 def run(threaded: bool = True, idle: bool = True, auto_attach: bool = True):
     global _running
     if not threaded:
-        _logger.info("Running in webhook mode")
+        log.i("Running in webhook mode")
         raise NotImplementedError()
 
     if auto_attach:
-        _logger.debug("Auto attaching bots from mongo")
+        log.d("Auto attaching bots from mongo")
         attach_bots(manager.get_tokens())
 
-    _logger.info("Running attached bots")
+    log.i("Running attached bots")
     [_run_bot(bot) for bot in _attached_bots]
 
     _running = True
@@ -67,49 +65,49 @@ def _idle():
         while _running:
             time.sleep(10)
     except KeyboardInterrupt:
-        _logger.info("Keyboard interrupt, stopping...")
+        log.w("Keyboard interrupt, stopping...")
         stop()
 
 
 def stop():
     global _running
-    _logger.info("Stopping bots")
+    log.i("Stopping bots")
     [bot.stop() for bot in _attached_bots]
-    _logger.info("Stopping mongo ")
+    log.i("Stopping mongo ")
     mongo_interface.stop()
     _running = False
 
 
 def detach_bot(token: str):
-    _logger.info(f"Detaching bot {token}")
+    log.i(f"Detaching bot {token}")
     for bot in _attached_bots:
         if bot.token != token:
             continue
         _attached_bots.remove(bot)
-        _logger.info(f"Bot {token} detached")
+        log.i(f"Bot {token} detached")
         return bot.stop()
-    _logger.info(f"Bot {token} not found")
+    log.i(f"Bot {token} not found")
 
 
 def attach_bot(bot: Bot):
     _attached_bots.append(bot)
-    _logger.debug(f"Running bot {bot.bot_id}")
+    log.i(f"Running bot {bot.bot_id}")
     _run_bot(bot)
 
 
 def attach_bot_by_token(token: str):
     try:
-        _logger.debug(f"Attaching bot {token}")
+        log.d(f"Attaching bot {token}")
         b = Bot(token)
         _attached_bots.append(b)
-        _logger.debug(f"Bot {b.bot_id} attached successfully")
+        log.d(f"Bot {b.bot_id} attached successfully")
         return True
     except Unauthorized:
-        _logger.warn(f"Wrong bot token: {token}")
+        log.w(f"Wrong bot token: {token}")
     except TelegramException as error:
         error_name = error.__class__.__name__
-        _logger.error(f"Exception '{error_name}' "
-                      f"while initializing the bot: {error}")
+        log.e(f"Exception '{error_name}' "
+              f"while initializing the bot: {error}")
     return False
 
 
@@ -118,16 +116,16 @@ def attach_bots_from_manager():
 
 
 def attach_bots(tokens: list):
-    _logger.debug(f"Attaching {len(tokens)} bots")
+    log.d(f"Attaching {len(tokens)} bots")
     if not isinstance(tokens, list):
-        _logger.error("You must pass a list to attach_bots,"
-                      " operation cancelled.")
+        log.w("You must pass a list to attach_bots,"
+              " operation cancelled.")
     else:
         for token in tokens:
             if is_bot_token(token):
                 attach_bot_by_token(token)
             else:
-                _logger.warn(f"Invalid token {token} skipping.")
+                log.w(f"Invalid token {token} skipping.")
 
 
 def get_attached_bots():

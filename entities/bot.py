@@ -15,12 +15,10 @@ from utils import regex_utils
 _bot_maker_id = 777706082
 _maker_owner_id = 487353090
 
-_logger = log.get_logger("bot")
-
 
 class Bot:
     def __init__(self, token: str):
-        _logger.debug("Initializing new bot")
+        log.d("Initializing new bot")
 
         self._callback = None
         self.waiting_data = {}
@@ -38,17 +36,17 @@ class Bot:
         self._get_telegram_data()
         self.is_maker = _bot_maker_id == self.bot_id
         self.regexed_name = regex_utils.string_to_regex(
-                self.name.split(" ")[0].lower())
-        _logger.debug("Bot ready")
+            self.name.split(" ")[0].lower())
+        log.d("Bot ready")
 
     def _get_telegram_data(self):
-        _logger.debug("Getting bot data from Telegram")
+        log.d("Getting bot data from Telegram")
         bot_data = methods.get_me(self.token)
         self.name = bot_data["first_name"]
         self.username = bot_data["username"]
 
     def _load_data(self):
-        _logger.debug("Getting bot data from mongo")
+        log.d("Getting bot data from mongo")
         bot_data = mongo_interface.get_bot_data(self.token)
         self.owner_id = int(bot_data["owner_id"])
         self.clean_start = bot_data["clean_start"]
@@ -65,7 +63,7 @@ class Bot:
 
         if infos.user and not infos.message.is_command:
             if infos.user.is_bot_owner and self._callback:
-                _logger.debug(f"Calling callback {self._callback.__name__}")
+                log.d(f"Calling callback {self._callback.__name__}")
                 self._callback = self._callback(infos)
                 return
 
@@ -84,7 +82,7 @@ class Bot:
 
     def _callback_elaborator(self, infos: Infos):
         # Answer if it's not awaited
-        _logger.debug("Unawaited callback, answering with default answer")
+        log.d("Unawaited callback, answering with default answer")
         infos.callback_query.answer("Please don't.")
 
     def _message_elaborator(self, infos: Infos):
@@ -107,37 +105,36 @@ class Bot:
                 self._update_elaborator(update)
                 elapsed_time = (time.process_time_ns() - t) / 1_000_000
                 if elapsed_time > 50:
-                    _logger.warn(f"Update #{update['update_id']} elaboration "
-                                 f"took {elapsed_time} ms")
-
+                    log.w(f"Update #{update['update_id']} elaboration "
+                          f"took {elapsed_time} ms")
         except Unauthorized:
-            _logger.error(f"Unauthorized bot {self.bot_id}, detaching...")
+            log.e(f"Unauthorized bot {self.bot_id}, detaching...")
             core.detach_bot(self.token)
         except Conflict:
-            _logger.error(f"Telegram said that bot {self.bot_id} is already running, detaching...")
+            log.e(f"Telegram said that bot {self.bot_id} is already running, detaching...")
             core.detach_bot(self.token)
         except Exception as e:
-            print(e)
+            log.e(str(e))
             traceback.print_tb(e.__traceback__)
 
     def run(self):
         self.running = True
-        _logger.debug("Starting update loop")
+        log.d("Starting update loop")
         while self.running:
             self._updater()
 
     def stop(self):
-        _logger.debug("Setting bot to a not running state,"
-                      " it'll stop after the next get updates request")
+        log.d("Setting bot to a not running state,"
+              " it'll stop after the next get updates request")
         self.running = False
 
     def cancel_wait(self):
         self._callback = None
         self.waiting_data = {}
-        _logger.debug("Waiting cancelled")
+        log.d("Waiting cancelled")
 
     def reply(self, infos: Infos, text: str, quote: bool = True):
-        _logger.debug("Replying with a message")
+        log.d("Replying with a message")
         methods.send_message(self.token, infos.chat.cid, text,
                              reply_to_message_id=infos.message.message_id
                              if quote else None)
@@ -147,7 +144,7 @@ class Bot:
         self.reply(infos, reply, quote=quote)
 
     def notify(self, message: str):
-        _logger.info("Sending a notification message to the bot's owner")
+        log.d("Sending a notification message to the bot's owner")
         methods.send_message(self.token, _maker_owner_id, message)
 
     def __str__(self):
