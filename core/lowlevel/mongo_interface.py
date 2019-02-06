@@ -6,6 +6,8 @@ from threading import Lock
 from pymongo.collection import Collection
 
 from entities.dialog import Dialog
+from entities.group import Group
+from entities.user import User
 from entities.trigger import Trigger
 from exceptions.telegram_exception import TelegramException
 from exceptions.unregistered_bot import UnregisteredBot
@@ -205,3 +207,55 @@ def delete_dialog(dialog: Dialog): _get_db().dialogs.delete_one(dict(dialog))
 
 
 def delete_trigger(trigger): _get_db().triggers.delete_one(dict(trigger))
+
+
+def add_group(group: Group):
+    _get_db().groups.insert_one(dict(group))
+
+
+def delete_group(group: Group):
+    _get_db().groups.delete_one(dict(group))
+
+
+def get_groups() -> List[Group]:
+    return [Group.from_json(group) for group in _get_db().groups.find()]
+
+
+def get_bot_groups(bid: int) -> List[Group]:
+    return [Group.from_json(group) for group in _get_db().groups.find({
+        "present_bots": {"$in": [bid]}
+    })]
+
+
+def update_group(old_group: Group, new_group: Group):
+    _get_db().groups.update_one(dict(old_group), dict(new_group))
+
+
+def add_user(user: User):
+    _get_db().users.insert_one(dict(user))
+
+
+def delete_user(user: User):
+    _get_db().users.delete_one(dict(user))
+
+
+def get_users() -> List[User]:
+    return [User.from_json(user) for user in _get_db().users.find()]
+
+
+def update_user(old_user: User, new_user: User):
+    _get_db().users.update_one(dict(old_user), dict(new_user))
+
+
+def get_known_users(bid: int):
+    return [User.from_json(user) for user in _get_db().users.find({
+        "known_bots": {"$in": [bid]}
+    })]
+
+
+def drop_users():
+    _get_db().users.drop()
+
+
+def drop_grops():
+    _get_db().groups.drop()
