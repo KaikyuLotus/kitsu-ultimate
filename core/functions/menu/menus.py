@@ -366,7 +366,7 @@ def list_dialogs(infos: Infos) -> Callable:
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
 
     # Final message to append
-    f_msg = "Do you need something else, {name}?"
+    f_msg = "Do you need something else, {user.name}?"
 
     if not dialogs:
         msg = f"No dialogs for section `{section}`\n\n{f_msg}"
@@ -427,7 +427,7 @@ def menu_choice(infos: Infos) -> Callable:
 
 
 def menu(infos: Infos) -> Callable:
-    infos.reply("Welcome {name}, what do you need?", markup=keyboards.menu())
+    infos.reply("Welcome {user.name}, what do you need?", markup=keyboards.menu())
     return menu_choice
 
 

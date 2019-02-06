@@ -15,7 +15,7 @@ def bid(infos: Infos):
 
 
 def start(infos: Infos):
-    infos.reply("Hello {name}!")
+    infos.reply("Hello {user.name}!")
 
 
 def uid(infos: Infos):

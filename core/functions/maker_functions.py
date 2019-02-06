@@ -12,10 +12,10 @@ def token_callback(infos: Infos):
             return infos.bot.cancel_wait()
 
     if not infos.message.is_text:
-        return infos.reply("{name} i'm waiting for a token...")
+        return infos.reply("{user.name} i'm waiting for a token...")
 
     if not bot_utils.is_bot_token(infos.message.text):
-        return infos.reply("{name} i think that this isn't a valid token...")
+        return infos.reply("{user.name} i think that this isn't a valid token...")
 
     infos.reply("Creating a new bot with this token...")
     infos.bot.cancel_wait()
