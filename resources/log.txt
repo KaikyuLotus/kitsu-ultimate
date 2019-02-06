@@ -1,0 +1,23 @@
+[INFO    ] - 02:33:45 - <module>             -> Getting data from configuration file
+[DEBUG   ] - 02:33:45 - parse_config_file    -> Env config var is in current env
+[DEBUG   ] - 02:33:45 - parse_config_file    -> Result: mongo.db_name=dev
+[INFO    ] - 02:33:45 - <module>             -> Starting Kitsu Ultimate
+[DEBUG   ] - 02:33:45 - run                  -> Auto attaching bots from mongo
+[DEBUG   ] - 02:33:46 - attach_bots          -> Attaching 2 bots
+[DEBUG   ] - 02:33:46 - attach_bot_by_token  -> Attaching bot 558241218:AAGjc6HbQInm0aPJuqAV5VpRZ5wXax75lJU
+[DEBUG   ] - 02:33:46 - __init__             -> Initializing new bot
+[DEBUG   ] - 02:33:46 - _load_data           -> Getting bot data from mongo
+[DEBUG   ] - 02:33:46 - _get_telegram_data   -> Getting bot data from Telegram
+[DEBUG   ] - 02:33:46 - __init__             -> Bot ready
+[DEBUG   ] - 02:33:46 - attach_bot_by_token  -> Bot 558241218 attached successfully
+[DEBUG   ] - 02:33:46 - attach_bot_by_token  -> Attaching bot 764850488:AAFwWEb3PMQq6emkykMnw7cKgM7fL0YpMOM
+[DEBUG   ] - 02:33:46 - __init__             -> Initializing new bot
+[DEBUG   ] - 02:33:46 - _load_data           -> Getting bot data from mongo
+[DEBUG   ] - 02:33:46 - _get_telegram_data   -> Getting bot data from Telegram
+[DEBUG   ] - 02:33:47 - __init__             -> Bot ready
+[DEBUG   ] - 02:33:47 - attach_bot_by_token  -> Bot 764850488 attached successfully
+[INFO    ] - 02:33:47 - run                  -> Running attached bots
+[INFO    ] - 02:33:48 - _init                -> Bot @SyntaxerControllerBot ok
+[DEBUG   ] - 02:33:48 - run                  -> Starting update loop
+[INFO    ] - 02:33:48 - _init                -> Bot @JavyRobot ok
+[DEBUG   ] - 02:33:48 - run                  -> Starting update loop

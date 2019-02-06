@@ -5,7 +5,7 @@ _level = logging.DEBUG
 _file_level = logging.INFO
 _format = '[%(levelname)-8s] - %(asctime)s - %(funcName)-20s -> %(message)s'
 _date_format = "%H:%M:%S"
-_file_name = "logger/log.txt"
+_file_name = "resources/log.txt"
 
 logging.basicConfig(level=_file_level,
                     format=_format,
@@ -29,5 +29,4 @@ def get_logger(name: str):
     logger = logging.getLogger(name)
     logger.setLevel(_level)
     logger.addHandler(get_console())
-    logger.debug(f"Logger {name} ready")
     return logger
