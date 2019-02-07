@@ -22,6 +22,8 @@ dummies = {
         "{bot.groups}": "infos.db.get_groups_count()",
         "{bot.users}": "infos.db.get_users_count()",
         "{bot.started_users}": "infos.db.get_started_users_count()",
+        "{chat.name}": "infos.chat.name",
+        "{chat.id}": "infos.chat.cid",
         "{bots_count}": "manager.get_bots_count()",
         "{exec_time}": "ping(infos)",
         "{triggers.count}": "'unimplemented'",
