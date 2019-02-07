@@ -67,7 +67,7 @@ def read_trigger(infos: Infos) -> Callable:
     mongo_interface.add_trigger(t)
 
     triggers = mongo_interface.get_triggers_of_type_and_section(
-            infos.bot.bot_id, t_type, section,
+        infos.bot.bot_id, t_type, section,
     )
 
     msg = "Now send the triggers as replies."
@@ -176,7 +176,7 @@ def wait_trigger_type_add_reply(infos: Infos) -> Callable:
 
     section = infos.bot.waiting_data["section"]
     triggers = mongo_interface.get_triggers_of_type_and_section(
-            infos.bot.bot_id, sel_type, section
+        infos.bot.bot_id, sel_type, section
     )
     triggs = make_trigger_list(triggers)
 
@@ -244,8 +244,28 @@ def wait_del_dialog_reply(infos: Infos) -> Callable:
         if infos.callback_query.data == "done":
             return to_menu(infos)
 
+    if infos.message.is_sticker:
+        reply = "{media:stk," + infos.message.sticker.stkid + "}"
+    elif infos.message.is_photo:
+        reply = "{media:pht," + infos.message.photo.phtid
+        if infos.message.photo.caption:
+            reply += "," + infos.message.photo.caption + "}"
+        else:
+            reply += "}"
+    elif infos.message.is_audio:
+        reply = "{media:aud," + infos.message.audio.audid + "}"
+    elif infos.message.is_voice:
+        reply = "{media:voe," + infos.message.voice.voiceid + "}"
+    elif infos.message.is_document:
+        reply = "{media:doc," + infos.message.document.docid + "}"
+    elif infos.message.is_text:
+        reply = infos.message.text
+    else:
+        infos.reply("Unsupported.")
+        return wait_del_dialog_reply
+
     section = infos.bot.waiting_data["section"]
-    reply = infos.message.text
+
     dialog = Dialog(reply, section, "IT", infos.bot.bot_id)
     mongo_interface.add_dialog(dialog)
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)

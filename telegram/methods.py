@@ -64,11 +64,97 @@ def send_message(token: str,
                  parse_mode: str = None,
                  reply_markup: str = None):
     return execute(token, "sendMessage", {
-        "text":                text,
-        "chat_id":             chat_id,
+        "text": text,
+        "chat_id": chat_id,
         "reply_to_message_id": reply_to_message_id,
-        "parse_mode":          parse_mode,
-        "reply_markup":        reply_markup
+        "parse_mode": parse_mode,
+        "reply_markup": reply_markup
+    })
+
+
+def send_sticker(token: str,
+                 chat_id: int,
+                 sticker: str,
+                 disable_notification: bool = None,
+                 reply_to_message_id: int = None,
+                 reply_markup: str = None):
+    return execute(token, "sendSticker", {
+        "chat_id": chat_id,
+        "sticker": sticker,
+        "disable_notification": disable_notification,
+        "reply_to_message_id": reply_to_message_id,
+        "reply_markup": reply_markup
+    })
+
+
+def send_photo(token: str,
+               chat_id: int,
+               photo: str,
+               caption: str = None,
+               disable_notification: bool = None,
+               reply_to_message_id: int = None,
+               reply_markup: str = None):
+    return execute(token, "sendPhoto", {
+        "chat_id": chat_id,
+        "photo": photo,
+        "caption": caption,
+        "disable_notification": disable_notification,
+        "reply_to_message_id": reply_to_message_id,
+        "reply_markup": reply_markup
+    })
+
+
+def send_audio(token: str,
+               chat_id: int,
+               audio: str,
+               disable_notification: bool = None,
+               reply_to_message_id: int = None,
+               reply_markup: str = None):
+    return execute(token, "sendAudio", {
+        "chat_id": chat_id,
+        "audio": audio,
+        "disable_notification": disable_notification,
+        "reply_to_message_id": reply_to_message_id,
+        "reply_markup": reply_markup
+    })
+
+
+def send_voice(token: str,
+               chat_id: int,
+               voice: str,
+               disable_notification: bool = None,
+               reply_to_message_id: int = None,
+               reply_markup: str = None):
+    return execute(token, "sendVoice", {
+        "chat_id": chat_id,
+        "voice": voice,
+        "disable_notification": disable_notification,
+        "reply_to_message_id": reply_to_message_id,
+        "reply_markup": reply_markup
+    })
+
+
+def send_doc(token: str,
+             chat_id: int,
+             document: str,
+             disable_notification: bool = None,
+             reply_to_message_id: int = None,
+             reply_markup: str = None):
+    return execute(token, "sendDocument", {
+        "chat_id": chat_id,
+        "document": document,
+        "disable_notification": disable_notification,
+        "reply_to_message_id": reply_to_message_id,
+        "reply_markup": reply_markup
+    })
+
+
+def send_chat_action(token: str,
+                     chat_id: int,
+                     action: str):
+    return execute(token, "sendChatAction", {
+        "chat_id": chat_id,
+        "action": action,
     })
 
 
@@ -80,10 +166,10 @@ def answer_callback_query(token: str,
                           cache_time: int = None):
     return execute(token, "answerCallbackQuery", {
         "callback_query_id": callback_query_id,
-        "text":              text,
-        "show_alert":        show_alert,
-        "url":               url,
-        "cache_time":        cache_time
+        "text": text,
+        "show_alert": show_alert,
+        "url": url,
+        "cache_time": cache_time
     })
 
 
@@ -96,20 +182,20 @@ def edit_message_text(token: str,
                       disable_web_page_preview: bool = None,
                       reply_markup: str = None):
     return execute(token, "editMessageText", {
-        "text":                     text,
-        "chat_id":                  chat_id,
-        "message_id":               message_id,
-        "inline_message_id":        inline_message_id,
-        "parse_mode":               parse_mode,
+        "text": text,
+        "chat_id": chat_id,
+        "message_id": message_id,
+        "inline_message_id": inline_message_id,
+        "parse_mode": parse_mode,
         "disable_web_page_preview": disable_web_page_preview,
-        "reply_markup":             reply_markup
+        "reply_markup": reply_markup
     })
 
 
 def delete_message(token: str, chat_id: int, message_id: int):
     return execute(token, "deleteMessage", {
         "message_id": message_id,
-        "chat_id":    chat_id
+        "chat_id": chat_id
     })
 
 

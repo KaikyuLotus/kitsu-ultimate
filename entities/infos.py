@@ -72,12 +72,9 @@ class Infos:
               markup: Dict = None):
 
         if parse:
-            text, quote = reply_parser.parse(text, self)
-
-        methods.send_message(self.bot, self.chat.cid, text,
-                             self.message.message_id if quote else None,
-                             parse_mode=parse_mode,
-                             reply_markup=markup)
+            reply_parser.execute(text, self, markup=markup)
+        else:
+            methods.send_message(self.bot.token, self.chat.cid, text, parse_mode=parse_mode, reply_markup=markup)
 
     def edit(self, text: str,
              parse_mode: str = "markdown",
@@ -175,16 +172,42 @@ class User:
 
 class Message:
     def __init__(self, message: dict, bot):
+
+        self.text = None
+        self.sticker = None
+        self.photo = None
+        self.audio = None
+        self.document = None
+
         self.message_id = message["message_id"]
 
         self.is_text = "text" in message
-        self.text = message["text"] if self.is_text else None
+        if self.is_text:
+            self.text = message["text"]
 
         self.is_sticker = "sticker" in message
-        self.sticker = Sticker(message["sticker"]) if self.is_sticker else None
+        if self.is_sticker:
+            self.sticker = Sticker(message["sticker"])
 
         self.is_photo = "photo" in message
-        self.photo = "si" if self.is_photo else None
+        if self.is_photo:
+            caption = message["caption"] if "caption" in message else None
+            self.photo = Photo(message["photo"], caption)
+
+        self.is_audio = "audio" in message
+        if self.is_audio:
+            self.audio = Audio(message["audio"])
+
+        self.is_voice = "voice" in message
+        if self.is_voice:
+            self.voice = Voice(message["voice"])
+
+        self.is_document = "document" in message
+        if self.is_document:
+            self.document = Document(message["document"])
+
+        if self.is_document:
+            print(message["document"])
 
         self.args = []
         self.is_command = False
@@ -208,6 +231,38 @@ class Message:
             self.what = "photo"
         else:
             self.what = "unknown"
+
+
+class Document:
+    def __init__(self, document: dict):
+        self.file_name = document["file_name"]
+        self.mime_type = document["mime_type"]
+        self.file_size = document["file_size"]
+        self.docid = document["file_id"]
+
+
+class Voice:
+    def __init__(self, voice: dict):
+        self.voiceid = voice["file_id"]
+        self.duration = voice["duration"]
+        self.mime_type = voice["mime_type"]
+        self.file_size = voice["file_size"]
+
+
+class Audio:
+    def __init__(self, audio: dict):
+        self.audid = audio["file_id"]
+        self.duration = audio["duration"]
+        self.mime_type = audio["mime_type"]
+        self.title = audio["title"]
+        self.performer = audio["performer"]
+        self.file_size = audio["file_size"]
+
+
+class Photo:
+    def __init__(self, photo: dict, caption: str):
+        self.phtid = photo[-1]["file_id"]
+        self.caption = caption
 
 
 class Sticker:
