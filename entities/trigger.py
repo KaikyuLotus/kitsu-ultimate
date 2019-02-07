@@ -19,6 +19,8 @@ class Trigger:
 
     @classmethod
     def from_json(cls, json):
+        if not json:
+            return None
         return cls(json["type"],
                    json["trigger"],
                    json["section"],

@@ -13,6 +13,8 @@ class Dialog:
 
     @classmethod
     def from_json(cls, json):
+        if not json:
+            return None
         return cls(json["reply"],
                    json["section"],
                    json["language"],

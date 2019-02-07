@@ -3,6 +3,8 @@ import time
 from typing import Dict
 
 from core import reply_parser
+from core.lowlevel import mongo_interface
+from entities import user, group
 from telegram import methods
 
 maker_owner_id = 487353090
@@ -43,6 +45,10 @@ class Infos:
             self.update_type = "edited_message"
         elif self.is_edited_channel_post:
             self.update_type = "edited_channel_post"
+
+        self.db = DB(self.bot.bot_id,
+                     None if (self.chat.is_channel or self.chat.is_private) else self.chat.cid,
+                     self.user.uid)
 
     def _load_callback_query(self, update):
         self.callback_query = CallbackQuery(update["callback_query"], self.bot)
@@ -206,3 +212,40 @@ class Message:
 class Sticker:
     def __init__(self, sticker: dict):
         self.stkid = sticker["file_id"]
+
+
+class DB:
+    def __init__(self, bid, cid, uid):
+        print(bid, cid, uid)
+        self.bid = bid
+
+        # If it's a group
+        if cid:
+            self.group = mongo_interface.get_group(cid)
+            # If the group doesn't exist
+            if not self.group:
+                # Create it and add it
+                self.group = group.Group(cid, [bid])
+                mongo_interface.add_group(self.group)
+            else:
+                # Otherwise check if the bot is not present
+                if bid not in self.group.present_bots:
+                    # If so add it and update the group
+                    self.group.present_bots.append(bid)
+                    mongo_interface.update_group_by_id(self.group)
+        else:
+            self.group = None
+
+        self.user = mongo_interface.get_user(uid)
+        if not self.user:
+            self.user = user.User(uid, [bid], self.group is None)
+            mongo_interface.add_user(self.user)
+
+    def get_groups_count(self) -> int:
+        return len(mongo_interface.get_bot_groups(self.bid))
+
+    def get_users_count(self) -> int:
+        return len(mongo_interface.get_known_users(self.bid))
+
+    def get_started_users_count(self) -> int:
+        return len(mongo_interface.get_known_started_users(self.bid))

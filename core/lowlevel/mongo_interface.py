@@ -221,6 +221,10 @@ def get_groups() -> List[Group]:
     return [Group.from_json(group) for group in _get_db().groups.find()]
 
 
+def get_group(group_id: int) -> Group:
+    return Group.from_json(_get_db().groups.find_one({"cid": group_id}))
+
+
 def get_bot_groups(bid: int) -> List[Group]:
     return [Group.from_json(group) for group in _get_db().groups.find({
         "present_bots": {"$in": [bid]}
@@ -229,6 +233,10 @@ def get_bot_groups(bid: int) -> List[Group]:
 
 def update_group(old_group: Group, new_group: Group):
     _get_db().groups.update_one(dict(old_group), dict(new_group))
+
+
+def update_group_by_id(new_group: Group):
+    _get_db().groups.replace_one({"cid": new_group.cid}, dict(new_group))
 
 
 def add_user(user: User):
@@ -243,8 +251,16 @@ def get_users() -> List[User]:
     return [User.from_json(user) for user in _get_db().users.find()]
 
 
+def get_user(user_id: int) -> User:
+    return User.from_json(_get_db().users.find_one({"uid": user_id}))
+
+
 def update_user(old_user: User, new_user: User):
     _get_db().users.update_one(dict(old_user), dict(new_user))
+
+
+def update_user_by_id(new_user: User):
+    _get_db().users.replace_one({"uid": new_user.uid}, dict(new_user))
 
 
 def get_known_users(bid: int):
@@ -253,9 +269,16 @@ def get_known_users(bid: int):
     })]
 
 
+def get_known_started_users(bid: int):
+    return [User.from_json(user) for user in _get_db().users.find({
+        "known_bots": {"$in": [bid]},
+        "started": True
+    })]
+
+
 def drop_users():
     _get_db().users.drop()
 
 
-def drop_grops():
+def drop_groups():
     _get_db().groups.drop()
