@@ -151,6 +151,7 @@ class Chat:
     def __init__(self, chat: dict):
         self.cid = chat["id"]
         self.chat_type = chat["type"]
+        self.name = chat["title"] if "title" in chat else chat["first_name"]
 
         self.is_private = self.chat_type == "private"
         self.is_group = self.chat_type == "group"
