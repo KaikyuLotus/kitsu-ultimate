@@ -5,12 +5,17 @@ from configuration import configuration
 def parse_config_file(file_name):
     config = {}
     for line in open(file_name).readlines():
+        line = line.rstrip()
+
+        if line.startswith("#") or line == "":
+            continue
+
         if "=" not in line or line.startswith("="):
             raise BadConfigurationFileFormat(file_name)
 
         # rstrip needed to remove final newline
         # we need to split only the first =, the value can contain other =
-        key, value = line.rstrip().split("=", maxsplit=1)
+        key, value = line.split("=", maxsplit=1)
 
         # we just need to check the first word before the dot
         # and we need the rest of the string as a singe value if needed
