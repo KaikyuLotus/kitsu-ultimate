@@ -94,6 +94,11 @@ def elaborate(infos: Infos):
         triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id,
                                                         t_type_elaborator)
         for trigger in triggers:
+            if "@" in trigger.trigger:
+                trigger.trigger, username = trigger.trigger.split("@")
+                if username.lower() != infos.user.username.lower():
+                    continue
+
             if t_type_elaborators[t_type_elaborator](infos, trigger):
                 return
 

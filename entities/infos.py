@@ -72,9 +72,9 @@ class Infos:
               markup: Dict = None):
 
         if parse:
-            reply_parser.execute(text, self, markup=markup)
+            return reply_parser.execute(text, self, markup=markup)
         else:
-            methods.send_message(self.bot.token, self.chat.cid, text, parse_mode=parse_mode, reply_markup=markup)
+            return methods.send_message(self.bot.token, self.chat.cid, text, parse_mode=parse_mode, reply_markup=markup)
 
     def edit(self, text: str,
              parse_mode: str = "markdown",
@@ -161,6 +161,8 @@ class User:
         self.name = user["first_name"]
         self.surname = user["last_name"] if "last_name" in user else None
         self.username = user["username"] if "username" in user else None
+        self.language_code = user["language_code"] if "language_code" in user else None
+
         self.uid = user["id"]
         self.is_bot = user["is_bot"]
         self.is_bot_owner = self.uid == bot.owner_id
@@ -205,9 +207,6 @@ class Message:
         self.is_document = "document" in message
         if self.is_document:
             self.document = Document(message["document"])
-
-        if self.is_document:
-            print(message["document"])
 
         self.args = []
         self.is_command = False
@@ -272,7 +271,6 @@ class Sticker:
 
 class DB:
     def __init__(self, bid, cid, uid):
-        print(bid, cid, uid)
         self.bid = bid
 
         # If it's a group

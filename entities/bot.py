@@ -1,5 +1,6 @@
 import time
 import traceback
+from pprint import pprint
 
 from core import elaborator, reply_parser, core
 from core.lowlevel import mongo_interface
@@ -116,6 +117,7 @@ class Bot:
         except Exception as e:
             log.e(str(e))
             traceback.print_tb(e.__traceback__)
+            pprint(update)
 
     def run(self):
         self.running = True

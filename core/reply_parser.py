@@ -92,17 +92,24 @@ def parse_sections(reply: str, infos) -> str:
 
 
 def elaborate_multx(reply: str, infos):
-    for action, var in re.findall(r"(send|action|wait):(?:(.+?)(?: then|]))", reply):
+    last_msg_id = None
+    for action, var in re.findall(r"(send|action|wait|edit):(?:(.+?)(?: then|]))", reply):
         # TODO this can cause loops
         log.d(f"Action: {action}, var: {var}")
-        if action == "send":
+        if action == "send" or action == "edit":
             dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, var)
             if not dialogs:
                 log.d(f"No dialogs for section {var}")
                 continue
             dialog = choice(dialogs)
             log.d(f"Choosed reply {dialog.reply}")
-            infos.reply(dialog.reply, parse_mode=None)
+            if action == "send":
+                last_msg_id = infos.reply(dialog.reply, parse_mode=None)["message_id"]
+            else:
+                if not last_msg_id:
+                    log.w("This action has not sent a message before, so there's nothing to edit.")
+                    continue
+                infos.edit(dialog.reply, parse_mode=None, msg_id=last_msg_id)
         elif action == "action":
             actions = {"type": "typing"}
             if var not in actions:
@@ -142,6 +149,14 @@ def execute(reply: str, infos, markup=None):
             methods.send_doc(infos.bot.token, infos.chat.cid, media_id, reply_markup=markup)
         return
 
+    reply, quote = parse(reply, infos)
+
+    log.d("Sending message")
+    return methods.send_message(infos.bot.token, infos.chat.cid, reply,
+                                parse_mode="markdown", reply_markup=markup)
+
+
+def parse(reply: str, infos) -> (str, bool):
     log.d("Parsing reply string")
     reply = parse_sections(reply, infos)
     reply = parse_dummies(reply, infos)
@@ -150,19 +165,6 @@ def execute(reply: str, infos, markup=None):
     reg = r"rnd\[(\d+),\s*?(\d+)]"
     for min, max in re.findall(reg, reply):
         reply = re.sub(reg, str(random.randint(int(min), int(max))), reply, count=1)
-
-    quote = "[quote]" in reply
-    reply = reply.replace("[quote]", "")
-
-    log.d("Sending message")
-    methods.send_message(infos.bot.token, infos.chat.cid, reply,
-                         parse_mode="markdown", reply_markup=markup)
-
-
-def parse(reply: str, infos) -> (str, bool):
-    reply = parse_sections(reply, infos)
-    reply = parse_dummies(reply, infos)
-    reply = parse_str_dummies(reply, infos)
 
     quote = "[quote]" in reply
     reply = reply.replace("[quote]", "")
