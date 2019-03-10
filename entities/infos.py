@@ -54,7 +54,11 @@ class Infos:
         if self.user:
             uid = self.user.uid
 
-        self.db = DB(self.bot.bot_id, gid, uid)
+        quoted = None
+        if self.to_user:
+            quoted = self.to_user.uid
+
+        self.db = DB(self.bot.bot_id, gid, uid, quoted)
 
     def _load_callback_query(self, update):
         self.callback_query = CallbackQuery(update["callback_query"], self.bot)
@@ -285,8 +289,12 @@ class Sticker:
 
 
 class DB:
-    def __init__(self, bid, cid, uid):
+    def __init__(self, bid, cid, uid, quoted):
         self.bid = bid
+
+        self.group = None
+        self.user = None
+        self.quoted = None
 
         # If it's a group
         if cid:
@@ -302,14 +310,18 @@ class DB:
                     # If so add it and update the group
                     self.group.present_bots.append(bid)
                     mongo_interface.update_group_by_id(self.group)
-        else:
-            self.group = None
 
         if uid:
             self.user = mongo_interface.get_user(uid)
             if not self.user:
                 self.user = user.User(uid, [bid], self.group is None)
                 mongo_interface.add_user(self.user)
+
+        if quoted:
+            self.quoted = mongo_interface.get_user(quoted)
+            if not self.quoted:
+                self.quoted = user.User(quoted, [bid], self.group is None)
+                mongo_interface.add_user(self.quoted)
 
     def get_groups_count(self) -> int:
         return len(mongo_interface.get_bot_groups(self.bid))

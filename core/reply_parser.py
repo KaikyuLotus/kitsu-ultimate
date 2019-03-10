@@ -5,8 +5,13 @@ import re
 
 from random import choice
 
-from core.lowlevel import mongo_interface
+# Eval imports
+# noinspection PyUnresolvedReferences
 from core import manager
+# noinspection PyUnresolvedReferences
+from core.functions import advanced_dummies
+
+from core.lowlevel import mongo_interface
 from logger import log
 from telegram import methods
 
@@ -16,10 +21,17 @@ string_dummies = {
 
 dummies = {
     "$base": {
+        "{triggers.count}": "'unimplemented'",
+        "{dialogs.count}": "'unimplemented'",
+        "{equals.count}": "'unimplemented'",
+        "{contents.count}": "'unimplemented'",
+        "{interactions.count}": "'unimplemented'",
+        "{eteractions.count}": "'unimplemented'",
         "{user.name}": "infos.user.name",
         "{user.id}": "infos.user.uid",
         "{user.last_name}": "infos.user.surname",
         "{user.username}": "infos.user.username",
+        "{user.lang}": "infos.db.user.language",
         "{bot.id}": "infos.bot.bot_id",
         "{bot.name}": "infos.bot.name",
         "{bot.username}": "infos.bot.username",
@@ -30,22 +42,18 @@ dummies = {
         "{chat.id}": "infos.chat.cid",
         "{bots_count}": "manager.get_bots_count()",
         "{exec_time}": "ping(infos)",
-        "{triggers.count}": "'unimplemented'",
-        "{dialogs.count}": "'unimplemented'",
-        "{equals.count}": "'unimplemented'",
-        "{contents.count}": "'unimplemented'",
-        "{interactions.count}": "'unimplemented'",
-        "{eteractions.count}": "'unimplemented'",
         "{stats.read}": "manager.get_read_messages(infos.bot.bot_id)",
         "{stats.sent}": "manager.get_sent_messages(infos.bot.bot_id)",
+        "<drop_users>": "advanced_dummies.drop_users()"
     },
 
     "$on_reply": {
-        "{to_name}": "infos.to_user.name",
-        "{to_uid}": "infos.to_user.uid",
-        "{to_surname}": "infos.to_user.surname",
-        "{to_username}": "infos.to_user.username",
-        "{is_bot}": "infos.to_user.is_bot"
+        "{quoted.name}": "infos.to_user.name",
+        "{quoted.uid}": "infos.to_user.uid",
+        "{quoted.surname}": "infos.to_user.surname",
+        "{quoted.username}": "infos.to_user.username",
+        "{quoted.is_bot}": "infos.to_user.is_bot",
+        "{quoted.lang}": "infos.db.quoted.language"
     }
 }
 
@@ -61,7 +69,11 @@ def parse_dummies(reply: str, infos) -> str:
                 continue
 
         for dummy in dummies[dummy_t]:
-            if dummy in reply:  # eval is dangerous but here is totally controlled
+            if dummy in reply:
+                if dummy.startswith("<") and dummy.endswith(">"):
+                    if not infos.user.is_maker_owner:
+                        continue
+                # eval is dangerous but here it's totally under control
                 reply = reply.replace(dummy, str(eval(dummies[dummy_t][dummy])))
 
     return reply

@@ -31,30 +31,33 @@ _maker_master_commands = {
 }
 
 
-def complete_dialog(infos: Infos, dialog_section: str):
-    log.d(f"Elaborating reply of section {dialog_section}")
+def complete_dialog(infos: Infos, trigger: Trigger):
+    section: str = trigger.section
+    log.d(f"Elaborating reply of section {section}")
     dialogs: List[Dialog] = mongo_interface.get_dialogs_of_section(
-        infos.bot.bot_id, dialog_section)
+        infos.bot.bot_id, section)
 
     if not dialogs:
-        log.d(f"No dialogs set for section {dialog_section}")
+        log.d(f"No dialogs set for section {section}")
         return
 
     dialog = choice(dialogs)
     infos.reply(dialog.reply, parse_mode=None)
     mongo_interface.increment_sent_messages(infos.bot.bot_id)
+    mongo_interface.increment_dialog_usages(dialog)
+    mongo_interface.increment_trigger_usages(trigger)
     log.d("Replied")
     return True
 
 
 def elaborate_equal(infos: Infos, equal: Trigger):
     if regex_utils.is_equal(infos.message.text, equal.re_trigger):
-        return complete_dialog(infos, equal.section)
+        return complete_dialog(infos, equal)
 
 
 def elaborate_content(infos: Infos, content: Trigger):
     if regex_utils.is_content(infos.message.text, content.re_trigger):
-        return complete_dialog(infos, content.section)
+        return complete_dialog(infos, content)
 
 
 def elaborate_interaction(infos: Infos, interaction: Trigger):
@@ -65,7 +68,7 @@ def elaborate_interaction(infos: Infos, interaction: Trigger):
 
     if any([is_inter, is_bot_quote, is_bot_chat]):
         if regex_utils.is_in_message(infos.message.text, interaction.re_trigger):
-            return complete_dialog(infos, interaction.section)
+            return complete_dialog(infos, interaction)
 
 
 def elaborate_eteraction(infos: Infos, eteraction: Trigger):
@@ -76,10 +79,10 @@ def elaborate_eteraction(infos: Infos, eteraction: Trigger):
         log.d(f"Checking trigger {eteraction.re_trigger}")
         if regex_utils.is_in_message(infos.message.text, eteraction.re_trigger):
             log.d("Trigger is present in text")
-            return complete_dialog(infos, eteraction.section)
+            return complete_dialog(infos, eteraction)
 
 
-t_type_elaborators = {
+_t_type_elaborators = {
     "equal": elaborate_equal,
     "content": elaborate_content,
     "interaction": elaborate_interaction,
@@ -91,16 +94,21 @@ def elaborate(infos: Infos):
     if not infos.message.is_text:
         return
 
-    for t_type_elaborator in t_type_elaborators:
+    for t_type_elaborator in _t_type_elaborators:
         triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id,
                                                         t_type_elaborator)
         for trigger in triggers:
             if "@" in trigger.trigger:
-                trigger.trigger, username = trigger.trigger.split("@")
-                if username.lower() != infos.user.username.lower():
-                    continue
+                username: str
+                trigger.trigger, identifier = trigger.trigger.split("@")
+                if identifier.isnumeric():
+                    if infos.user.uid != int(identifier):
+                        continue
+                else:
+                    if username.lower() != infos.user.username.lower():
+                        continue
 
-            if t_type_elaborators[t_type_elaborator](infos, trigger):
+            if _t_type_elaborators[t_type_elaborator](infos, trigger):
                 return
 
 

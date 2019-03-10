@@ -56,8 +56,9 @@ class Bot:
         self.offset = update["update_id"] + 1
         infos = Infos(self, update)
 
-        # _logger.debug(f"Elaborating update {update['update_id']} "
-        #               f"of type {infos.update_type}")
+        if infos.is_edited_message or infos.is_channel_post or infos.is_edited_channel_post:
+            log.d(f"Ignoring update of type {infos.update_type}")
+            return
 
         if not self._callback:
             self.waiting_data = {}
@@ -74,13 +75,7 @@ class Bot:
                     infos.reply("Operation cancelled.")
                     return
 
-        if infos.is_edited_message:
-            pass  # TODO implement edited message handling
-        elif infos.is_channel_post:
-            pass  # TODO implement channel post handling
-        elif infos.is_edited_channel_post:
-            pass  # TODO implement edited channel post handling
-        elif infos.message.is_command:
+        if infos.message.is_command:
             mongo_interface.increment_read_messages(self.bot_id)
             self._command_elaborator(infos)
         elif infos.is_callback_query:

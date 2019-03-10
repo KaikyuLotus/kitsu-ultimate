@@ -14,17 +14,16 @@ def is_interaction(string: str, bot_name: str):
 
 
 def is_equal(string: str, trigger: str):
-    return True if re.search(rf"^{string_to_regex(trigger)}$", string,
+    return True if re.search(rf"^{trigger}$", string,
                              flags=re.I) else False
 
 
 def is_content(string: str, trigger: str):
-    r_trigger = string_to_regex(trigger)
-    if re.search(rf"\b{r_trigger}\b", string, flags=re.I):
-        return False if re.search(rf"^{r_trigger}$", string,
+    if re.search(rf"\b{trigger}\b", string, flags=re.I):
+        return False if re.search(rf"^{trigger}$", string,
                                   flags=re.I) else True
 
 
 def is_in_message(message: str, trigger: str):
-    return True if re.search(rf"\b{string_to_regex(trigger)}\b", message,
+    return True if re.search(rf"\b{trigger}\b", message,
                              flags=re.I) else False

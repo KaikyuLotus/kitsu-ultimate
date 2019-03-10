@@ -26,12 +26,16 @@ from utils import keyboards
 #      |->  close    ->| <del message>
 
 
+# TODO change section message layout?
 def make_sections_list(infos: Infos) -> Callable:
     sections = mongo_interface.get_sections(infos.bot.bot_id)
     res = ""
     i = 1
+    bid = infos.bot.bot_id
     for section in sections:
-        res += f"{i}] `{section}`\n"
+        d_count = len(mongo_interface.get_dialogs_of_section(bid, section))
+        t_count = len(mongo_interface.get_triggers_of_section(bid, section))
+        res += f"{i}] `{section}`\n  Triggers: `{t_count}` - Dialogs: `{d_count}`\n"
         i += 1
     return res
 
@@ -40,7 +44,7 @@ def make_trigger_list(triggers: List[Trigger]) -> str:
     out = ""
     i = 1
     for trigger in triggers:
-        out += f"{i}] `{trigger.trigger}` -> `{trigger.section}`\n"
+        out += f"{i}] `{trigger.trigger}` -> `{trigger.section} ({trigger.usages} usages)`\n"
         i += 1
     return out
 
@@ -49,7 +53,7 @@ def make_dialogs_list(dialogs: List[Dialog]) -> str:
     out = ""
     i = 1
     for dialog in dialogs:
-        out += f"{i}] `{dialog.reply}`\n"
+        out += f"{i}] `{dialog.reply} ({dialog.usages} usages)`\n"
         i += 1
     return out
 
@@ -108,7 +112,7 @@ def wait_del_trigger_index(infos: Infos) -> Callable:
     sel_type = infos.bot.waiting_data["type"]
     triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id, sel_type)
 
-    indexes: List[str] = infos.message.text.split(",")
+    indexes: List[str] = infos.message.text.split("," if "," in infos.message.text else " ")
     for stringIndex in indexes:
         try:
             index = int(stringIndex.strip())
@@ -177,6 +181,9 @@ def wait_trigger_type_add_reply(infos: Infos) -> Callable:
     if not infos.is_callback_query:
         return wait_trigger_type_add_reply
 
+    if infos.callback_query.data == "cancel":
+        return to_menu(infos, "Operation cancelled, do you need something else, {user.name}?")
+
     sel_type = select_trigger_type(infos)
     if not sel_type:
         return wait_trigger_type_add_reply
@@ -201,6 +208,9 @@ def add_trigger(infos: Infos) -> Callable:
     if not infos.is_message:
         return add_trigger
 
+    if not infos.message.is_text:
+        return add_trigger
+
     infos.bot.waiting_data["section"] = infos.message.text
     infos.edit("Please now select the trigger type",
                msg_id=infos.bot.waiting_data["msg"].message_id,
@@ -210,6 +220,12 @@ def add_trigger(infos: Infos) -> Callable:
 
 
 def list_triggers(infos: Infos) -> Callable:
+    if not infos.is_message:
+        return list_triggers
+
+    if not infos.message.is_text:
+        return list_triggers
+
     sect = infos.message.text
     triggers = mongo_interface.get_triggers_of_section(infos.bot.bot_id, sect)
     trigs = make_trigger_list(triggers)
@@ -302,6 +318,9 @@ def add_dialog(infos: Infos) -> Callable:
     if not infos.is_message:
         return list_dialogs
 
+    if not infos.message.is_text:
+        return add_dialog
+
     section = infos.message.text
     infos.bot.waiting_data["section"] = section
 
@@ -333,7 +352,7 @@ def wait_del_dialog_number(infos: Infos) -> Callable:
     section = infos.bot.waiting_data["section"]
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
 
-    indexes: List[str] = infos.message.text.split(",")
+    indexes: List[str] = infos.message.text.split("," if "," in infos.message.text else " ")
 
     for string_index in indexes:
         try:
@@ -376,6 +395,9 @@ def del_dialog(infos: Infos) -> Callable:
     if not infos.is_message:
         return del_dialog
 
+    if not infos.message.is_text:
+        return del_dialog
+
     section = infos.message.text
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
 
@@ -400,6 +422,9 @@ def del_dialog(infos: Infos) -> Callable:
 def list_dialogs(infos: Infos) -> Callable:
     # Waiting for a message (section)
     if not infos.is_message:
+        return list_dialogs
+
+    if not infos.message.is_text:
         return list_dialogs
 
     section = infos.message.text
@@ -521,8 +546,6 @@ def menu_sections(infos: Infos):
     if not infos.is_callback_query:
         return menu_triggers
 
-    markup = None
-
     if infos.callback_query.data == "del_section":
         return del_section(infos)
     elif infos.callback_query.data == "list_sections":
@@ -583,4 +606,5 @@ def to_menu(infos: Infos, msg=None) -> Callable:
                msg_id=infos.bot.waiting_data["msg"].message_id)
     # Reset waiting_data
     infos.bot.cancel_wait()
+
     return menu_choice

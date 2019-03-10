@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from pymongo import MongoClient
 from threading import Lock
@@ -34,6 +34,7 @@ _client = None
 _singleton_lock = Lock()
 
 
+# region MongoCore
 def _get_client():
     global _client
     _singleton_lock.acquire()
@@ -107,6 +108,7 @@ def register_bot(token: str, owner_id: int):
         # TODO implement languages
         "language": "IT"
     })
+# endregion
 
 
 def update_stats(bot_id: int, stats: Stats):
@@ -120,6 +122,29 @@ def get_stats(bot_id: int) -> Stats:
         stats = Stats(bot_id)
         _get_db().bot_stats.insert_one(dict(stats))
     return stats
+
+
+# TODO clean DB and remove compatibility if
+def increment_trigger_usages(trigger: Trigger):
+    if trigger.usages == 0:
+        n_trigger = dict(trigger)
+        n_trigger["usages"] = 1
+        o_trigger = dict(trigger)
+        del o_trigger["usages"]
+        replace_trigger(o_trigger, n_trigger)
+    else:
+        update_trigger(trigger, {"$inc": {"usages": 1}})
+
+
+def increment_dialog_usages(dialog: Dialog):
+    if dialog.usages == 0:
+        n_dialog = dict(dialog)
+        n_dialog["usages"] = 1
+        o_dialog = dict(dialog)
+        del o_dialog["usages"]
+        replace_dialog(o_dialog, n_dialog)
+    else:
+        update_dialog(dialog, {"$inc": {"usages": 1}})
 
 
 # TODO increment with $inc (https://stackoverflow.com/questions/27707365/how-to-increment-a-field-in-mongodb)
@@ -221,11 +246,19 @@ def get_bot_dialogs(bot_id: int) -> List[Dialog]:
     })]
 
 
-def update_dialog(old_dialog: Dialog, new_dialog: Dialog):
+def replace_dialog(old_dialog: Dialog, new_dialog: Union[Dialog, dict]):
+    _get_db().dialogs.replace_one(dict(old_dialog), dict(new_dialog))
+
+
+def update_dialog(old_dialog: Dialog, new_dialog: Union[Dialog, dict]):
     _get_db().dialogs.update_one(dict(old_dialog), dict(new_dialog))
 
 
-def update_trigger(old_trigger: Trigger, new_trigger: Trigger):
+def replace_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
+    _get_db().triggers.replace_one(dict(old_trigger), dict(new_trigger))
+
+
+def update_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
     _get_db().triggers.update_one(dict(old_trigger), dict(new_trigger))
 
 
