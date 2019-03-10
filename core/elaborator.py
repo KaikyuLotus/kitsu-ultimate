@@ -42,17 +42,18 @@ def complete_dialog(infos: Infos, dialog_section: str):
 
     dialog = choice(dialogs)
     infos.reply(dialog.reply, parse_mode=None)
+    mongo_interface.increment_sent_messages(infos.bot.bot_id)
     log.d("Replied")
     return True
 
 
 def elaborate_equal(infos: Infos, equal: Trigger):
-    if regex_utils.is_equal(infos.message.text, equal.trigger):
+    if regex_utils.is_equal(infos.message.text, equal.re_trigger):
         return complete_dialog(infos, equal.section)
 
 
 def elaborate_content(infos: Infos, content: Trigger):
-    if regex_utils.is_content(infos.message.text, content.trigger):
+    if regex_utils.is_content(infos.message.text, content.re_trigger):
         return complete_dialog(infos, content.section)
 
 
@@ -63,7 +64,7 @@ def elaborate_interaction(infos: Infos, interaction: Trigger):
                                           infos.bot.regexed_name)
 
     if any([is_inter, is_bot_quote, is_bot_chat]):
-        if regex_utils.is_in_message(infos.message.text, interaction.trigger):
+        if regex_utils.is_in_message(infos.message.text, interaction.re_trigger):
             return complete_dialog(infos, interaction.section)
 
 
@@ -72,8 +73,8 @@ def elaborate_eteraction(infos: Infos, eteraction: Trigger):
                                           infos.bot.regexed_name)
     if is_inter and infos.is_reply:
         log.d("Message is a reply and starts/ends with bot's name")
-        log.d(f"Checking trigger {eteraction.trigger}")
-        if regex_utils.is_in_message(infos.message.text, eteraction.trigger):
+        log.d(f"Checking trigger {eteraction.re_trigger}")
+        if regex_utils.is_in_message(infos.message.text, eteraction.re_trigger):
             log.d("Trigger is present in text")
             return complete_dialog(infos, eteraction.section)
 

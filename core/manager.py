@@ -19,3 +19,11 @@ def get_user_bots(user_id: int):
 
 def get_user_bots_count(user_id: int):
     return len(get_user_bots(user_id))
+
+
+def get_sent_messages(bot_id: int):
+    return mongo_interface.get_stats(bot_id).sent_messages
+
+
+def get_read_messages(bot_id: int):
+    return mongo_interface.get_stats(bot_id).read_messages

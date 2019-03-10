@@ -26,16 +26,25 @@ def menu_triggers():
     btn1 = methods.button("Add Trigger", "add_trigger")
     btn2 = methods.button("Del. Trigger", "del_trigger")
     btn4 = methods.button("List Triggers", "list_triggers")
-    back = methods.button("Back", "back")
+    back = methods.button("Back", "menu_back")
     return methods.inline_keyboard([[btn1, btn2],
                                     [btn4],
+                                    [back]])
+
+
+def menu_sections():
+    btn1 = methods.button("Del Section", "del_section")
+    btn2 = methods.button("List Sections", "list_sections")
+    back = methods.button("Back", "menu_back")
+    return methods.inline_keyboard([[btn1],
+                                    [btn2],
                                     [back]])
 
 
 def menu():
     btn1 = methods.button("Dialogs", "menu_dialogs")
     btn2 = methods.button("Triggers", "menu_triggers")
-    btn3 = methods.button("Sections", "menu_get_sections")
+    btn3 = methods.button("Sections", "menu_sections")
     close = methods.button("Close", "menu_close")
     return methods.inline_keyboard([[btn1, btn2, btn3],
                                     [close]])

@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from core.lowlevel import mongo_interface
 from entities.dialog import Dialog
@@ -103,26 +103,33 @@ def wait_del_trigger_index(infos: Infos) -> Callable:
         if infos.callback_query.data == "done":
             return to_menu(infos)
 
-    try:
-        index = int(infos.message.text)
-    except ValueError:
-        infos.reply(f"{infos.message.text} is not a valid index.")
-        return wait_del_trigger_index
+    to_remove: List[Trigger] = []
 
     sel_type = infos.bot.waiting_data["type"]
     triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id, sel_type)
 
-    if index < 1:
-        infos.reply("Index can't be lesser than one.")
-        return wait_del_trigger_index
+    indexes: List[str] = infos.message.text.split(",")
+    for stringIndex in indexes:
+        try:
+            index = int(stringIndex.strip())
+        except ValueError:
+            infos.reply(f"{infos.message.text} is not a valid index.")
+            return wait_del_trigger_index
 
-    if index - 1 > len(triggers):
-        infos.reply(f"{index} is too high, max: {len(triggers)}")
-        return wait_del_trigger_index
+        if index < 1:
+            infos.reply("Index can't be lesser than one.")
+            return wait_del_trigger_index
 
-    trigger = triggers[index - 1]
-    triggers.remove(trigger)
-    mongo_interface.delete_trigger(trigger)
+        if index - 1 > len(triggers):
+            infos.reply(f"{index} is too high, max: {len(triggers)}")
+            return wait_del_trigger_index
+
+        trigger = triggers[index - 1]
+        to_remove.append(trigger)
+
+    for trigger in to_remove:
+        triggers.remove(trigger)
+        mongo_interface.delete_trigger(trigger)
 
     if not triggers:
         return to_menu(infos, f"No more triggers of type {sel_type}\n"
@@ -153,7 +160,7 @@ def wait_trigger_type_del_trigger(infos: Infos) -> Callable:
 
     if not triggers:
         return to_menu(infos, f"No triggers of type {sel_type}.\n"
-        f"Do you need something else?")
+                              "Do you need something else?")
 
     triggs = make_trigger_list(triggers)
 
@@ -229,6 +236,10 @@ def menu_triggers(infos: Infos) -> Callable:
     elif infos.callback_query.data == "list_triggers":
         fun = list_triggers
         msg = "Please now send the trigger section"
+    elif infos.callback_query.data == "menu_back":
+        fun = menu_choice
+        msg = "Welcome {user.name}, what do you need?"
+        markup = keyboards.menu()
     else:
         infos.callback_query.answer("What...?")
         return menu_triggers
@@ -317,30 +328,39 @@ def wait_del_dialog_number(infos: Infos) -> Callable:
         if infos.callback_query.data == "done":
             return to_menu(infos)
 
-    try:
-        index = int(infos.message.text)
-    except ValueError:
-        infos.reply(f"`{infos.message.text}` is not a valid number.")
-        return wait_del_dialog_number
-
-    if index <= 0:
-        infos.reply("The minimum index is 1!")
-        return wait_del_dialog_number
+    to_delete: List[Dialog] = []
 
     section = infos.bot.waiting_data["section"]
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
 
-    if index - 1 > len(dialogs):
-        infos.reply(f"You've selected dialog n°{index} but "
-                    f"there are only {len(dialogs) + 1} dialogs")
-        return wait_del_dialog_number
+    indexes: List[str] = infos.message.text.split(",")
 
-    dialog = dialogs[index - 1]
-    mongo_interface.delete_dialog(dialog)
-    dialogs.remove(dialog)
+    for string_index in indexes:
+        try:
+            string_index = string_index.strip()
+            index = int(string_index)
+        except ValueError:
+            infos.reply(f"`{string_index}` is not a valid number.")
+            return wait_del_dialog_number
+
+        if index <= 0:
+            infos.reply("The minimum index is 1!")
+            return wait_del_dialog_number
+
+        if index - 1 > len(dialogs):
+            infos.reply(f"You've selected dialog n°{index} but "
+                        f"there are only {len(dialogs) + 1} dialogs")
+            return wait_del_dialog_number
+
+        dialog = dialogs[index - 1]
+        to_delete.append(dialog)
+
+    for dialog in to_delete:
+        mongo_interface.delete_dialog(dialog)
+        dialogs.remove(dialog)
 
     if not dialogs:
-        msg = f"No dialogs for section `{section}`\nDo you need something else?"
+        msg = f"No more dialogs for section `{section}`\nDo you need something else?"
         return to_menu(infos, msg)
 
     infos.edit(f"Dialogs for section `{section}`:\n{make_dialogs_list(dialogs)}"
@@ -354,7 +374,7 @@ def wait_del_dialog_number(infos: Infos) -> Callable:
 def del_dialog(infos: Infos) -> Callable:
     # Waiting for a message (section)
     if not infos.is_message:
-        return list_dialogs
+        return del_dialog
 
     section = infos.message.text
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
@@ -401,6 +421,8 @@ def menu_dialogs(infos: Infos):
     if not infos.is_callback_query:
         return menu_triggers
 
+    markup = None
+
     if infos.callback_query.data == "add_dialog":
         fun = add_dialog
         msg = "Please now send the dialog section"
@@ -410,15 +432,118 @@ def menu_dialogs(infos: Infos):
     elif infos.callback_query.data == "list_dialogs":
         fun = list_dialogs
         msg = "Please now send the dialog section"
+    elif infos.callback_query.data == "menu_back":
+        fun = menu_choice
+        msg = "Welcome {user.name}, what do you need?"
+        markup = keyboards.menu()
     else:
         infos.callback_query.answer("What...?")
         return menu_dialogs
 
-    infos.edit(msg, msg_id=infos.bot.waiting_data["msg"].message_id)
+    infos.edit(msg, msg_id=infos.bot.waiting_data["msg"].message_id,
+               reply_markup=markup)
     return fun
 
 
-def menu_choice(infos: Infos) -> Callable:
+def wait_del_section_number(infos: Infos) -> Callable:
+    if infos.is_callback_query:
+        if infos.callback_query.data == "done":
+            return to_menu(infos)
+
+    to_delete: List[str] = []
+
+    sections = mongo_interface.get_sections(infos.bot.bot_id)
+
+    indexes: List[str] = infos.message.text.split("," if "," in infos.message.text else " ")
+
+    for string_index in indexes:
+        try:
+            string_index = string_index.strip()
+            index = int(string_index)
+        except ValueError:
+            infos.reply(f"`{string_index}` is not a valid number.")
+            return wait_del_section_number
+
+        if index <= 0:
+            infos.reply("The minimum index is 1!")
+            return wait_del_section_number
+
+        if index - 1 > len(sections):
+            infos.reply(f"You've selected section n°{index} but "
+                        f"there are only {len(sections) + 1} sections")
+            return wait_del_section_number
+
+        section = sections[index - 1]
+        to_delete.append(section)
+
+    for section in to_delete:
+        mongo_interface.delete_dialogs_of_section(infos.bot.bot_id, section)
+        mongo_interface.delete_triggers_of_section(infos.bot.bot_id, section)
+        sections.remove(section)
+
+    if not sections:
+        msg = f"I don't have anymore sections\nDo you need something else?"
+        return to_menu(infos, msg)
+
+    infos.edit(f"Current sections:\n{make_sections_list(infos)}"
+               f"\n\nPlease send the number of the section you want to delete.\n"
+               f"*Remember that deleting a section means deleting every dialog/trigger linked to it!!*",
+               reply_markup=keyboards.done(),
+               msg_id=infos.bot.waiting_data["msg"].message_id)
+
+    return wait_del_section_number
+
+
+def del_section(infos: Infos) -> Callable:
+    # Waiting for a message (section)
+    if not infos.is_callback_query:
+        return del_section
+
+    sections = mongo_interface.get_sections(infos.bot.bot_id)
+
+    if not sections:
+        msg = f"I don't have any section\nDo you need something else?"
+        return to_menu(infos, msg)
+
+    msg = f"Here's the list of my sections:\n" \
+            f"\n{make_sections_list(infos)}\n" \
+            f"\nPlease now send the section to delete\n" \
+            f"*Remember that deleting a sections means deleting every message/trigger linked to it!!*"
+
+    infos.edit(msg,
+               reply_markup=keyboards.done(),
+               msg_id=infos.bot.waiting_data["msg"].message_id)
+
+    return wait_del_section_number
+
+
+def menu_sections(infos: Infos):
+    if not infos.is_callback_query:
+        return menu_triggers
+
+    markup = None
+
+    if infos.callback_query.data == "del_section":
+        return del_section(infos)
+    elif infos.callback_query.data == "list_sections":
+        fun = menu_choice
+        msg = f"{make_sections_list(infos)}\n" \
+            f"Do you need something else, {{user.name}}?"
+        markup = keyboards.menu()
+    elif infos.callback_query.data == "menu_back":
+        fun = menu_choice
+        msg = "Welcome {user.name}, what do you need?"
+        markup = keyboards.menu()
+    else:
+        infos.callback_query.answer("What...?")
+        return menu_dialogs
+
+    infos.edit(msg, msg_id=infos.bot.waiting_data["msg"].message_id,
+               reply_markup=markup)
+    return fun
+
+
+def menu_choice(infos: Infos) -> Optional[Callable]:
     if not infos.is_callback_query:
         return menu_choice
 
@@ -434,9 +559,10 @@ def menu_choice(infos: Infos) -> Callable:
                    reply_markup=keyboards.menu_triggers())
         return menu_triggers
 
-    if infos.callback_query.data == "menu_get_sections":
-        infos.edit(f"Sections:\n{make_sections_list(infos)}")
-        return
+    if infos.callback_query.data == "menu_sections":
+        infos.edit(f"Please choose an option",
+                   reply_markup=keyboards.menu_sections())
+        return menu_sections
 
     if infos.callback_query.data == "menu_close":
         infos.delete_message(infos.chat.cid, infos.message.message_id)

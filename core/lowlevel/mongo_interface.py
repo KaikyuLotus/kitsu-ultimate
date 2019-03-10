@@ -7,6 +7,7 @@ from pymongo.collection import Collection
 
 from entities.dialog import Dialog
 from entities.group import Group
+from entities.stats import Stats
 from entities.user import User
 from entities.trigger import Trigger
 from exceptions.telegram_exception import TelegramException
@@ -108,6 +109,32 @@ def register_bot(token: str, owner_id: int):
     })
 
 
+def update_stats(bot_id: int, stats: Stats):
+    _get_db().bot_stats.replace_one({"bot_id": bot_id}, dict(stats))
+
+
+def get_stats(bot_id: int) -> Stats:
+    stats = Stats.from_json(_get_db().bot_stats.find_one({"bot_id": bot_id}))
+    if not stats:
+        log.d(f"Registering stats for bot {bot_id}")
+        stats = Stats(bot_id)
+        _get_db().bot_stats.insert_one(dict(stats))
+    return stats
+
+
+# TODO increment with $inc (https://stackoverflow.com/questions/27707365/how-to-increment-a-field-in-mongodb)
+def increment_sent_messages(bot_id: int):
+    stats = get_stats(bot_id)
+    stats.sent_messages += 1
+    update_stats(bot_id, stats)
+
+
+def increment_read_messages(bot_id: int):
+    stats = get_stats(bot_id)
+    stats.read_messages += 1
+    update_stats(bot_id, stats)
+
+
 def get_dialogs_of_section(bot_id: int, section: str) -> List[Dialog]:
     return [Dialog.from_json(dialog) for dialog in _get_db().dialogs.find({
         "bot_id": bot_id,
@@ -175,6 +202,7 @@ def get_dialogs(bot_id: int) -> List[Dialog]:
     })]
 
 
+# TODO post-debug refactoring
 def add_trigger(trigger: Trigger): _get_db().triggers.insert_one(dict(trigger))
 
 
@@ -204,7 +232,21 @@ def update_trigger(old_trigger: Trigger, new_trigger: Trigger):
 def delete_dialog(dialog: Dialog): _get_db().dialogs.delete_one(dict(dialog))
 
 
-def delete_trigger(trigger): _get_db().triggers.delete_one(dict(trigger))
+def delete_dialogs_of_section(bot_id: int, section: str):
+    _get_db().dialogs.delete_many({
+        "section": section,
+        "bot_id": bot_id
+    })
+
+
+def delete_trigger(trigger: Trigger): _get_db().triggers.delete_one(dict(trigger))
+
+
+def delete_triggers_of_section(bot_id: int, section: str):
+    _get_db().triggers.delete_many({
+        "section": section,
+        "bot_id": bot_id
+    })
 
 
 def add_group(group: Group):

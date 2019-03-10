@@ -3,8 +3,8 @@ import re
 
 class Trigger:
     def __init__(self, t_type, trigger, section, bot_id, lang):
-        self.trigger = re.escape(trigger)
-        self.raw_trigger = trigger
+        self.trigger = trigger
+        self.re_trigger = re.escape(trigger)
         self.type = t_type
         self.section = section
         self.bot_id = int(bot_id)

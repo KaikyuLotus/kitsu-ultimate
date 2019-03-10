@@ -67,6 +67,12 @@ class Bot:
                 log.d(f"Calling callback {self._callback.__name__}")
                 self._callback = self._callback(infos)
                 return
+        else:
+            if infos.user.is_bot_owner and self._callback:
+                if infos.message.command == "cancel":
+                    self._callback = None
+                    infos.reply("Operation cancelled.")
+                    return
 
         if infos.is_edited_message:
             pass  # TODO implement edited message handling
@@ -75,10 +81,12 @@ class Bot:
         elif infos.is_edited_channel_post:
             pass  # TODO implement edited channel post handling
         elif infos.message.is_command:
+            mongo_interface.increment_read_messages(self.bot_id)
             self._command_elaborator(infos)
         elif infos.is_callback_query:
             self._callback_elaborator(infos)
         elif infos.is_message:
+            mongo_interface.increment_read_messages(self.bot_id)
             self._message_elaborator(infos)
 
     def _callback_elaborator(self, infos: Infos):

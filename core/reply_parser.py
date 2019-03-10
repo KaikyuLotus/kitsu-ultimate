@@ -6,6 +6,7 @@ import re
 from random import choice
 
 from core.lowlevel import mongo_interface
+from core import manager
 from logger import log
 from telegram import methods
 
@@ -34,7 +35,9 @@ dummies = {
         "{equals.count}": "'unimplemented'",
         "{contents.count}": "'unimplemented'",
         "{interactions.count}": "'unimplemented'",
-        "{eteractions.count}": "'unimplemented'"
+        "{eteractions.count}": "'unimplemented'",
+        "{stats.read}": "manager.get_read_messages(infos.bot.bot_id)",
+        "{stats.sent}": "manager.get_sent_messages(infos.bot.bot_id)",
     },
 
     "$on_reply": {
