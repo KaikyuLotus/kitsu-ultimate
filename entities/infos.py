@@ -83,8 +83,7 @@ class Infos:
 
         if parse:
             return reply_parser.execute(text, self, markup=markup)
-        else:
-            return methods.send_message(self.bot.token, self.chat.cid, text, parse_mode=parse_mode, reply_markup=markup)
+        return methods.send_message(self.bot.token, self.chat.cid, text, parse_mode=parse_mode, reply_markup=markup)
 
     def edit(self, text: str,
              parse_mode: str = "markdown",
@@ -94,8 +93,9 @@ class Infos:
              inline: bool = False,
              msg_id: int = None):
 
+        markdown = False
         if parse:
-            text, quote = reply_parser.parse(text, self)
+            text, quote, markdown = reply_parser.parse(text, self)
 
         inline_msg = None
         if inline:
@@ -110,7 +110,7 @@ class Infos:
                                          inline_message_id=inline_msg,
                                          message_id=msg_id,
                                          chat_id=chat_id,
-                                         parse_mode=parse_mode,
+                                         parse_mode=parse_mode if markdown else None,
                                          disable_web_page_preview=disable_web_page_preview,
                                          reply_markup=reply_markup)
 

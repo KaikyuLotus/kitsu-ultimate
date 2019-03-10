@@ -99,13 +99,14 @@ def elaborate(infos: Infos):
                                                         t_type_elaborator)
         for trigger in triggers:
             if "@" in trigger.trigger:
-                username: str
                 trigger.trigger, identifier = trigger.trigger.split("@")
                 if identifier.isnumeric():
                     if infos.user.uid != int(identifier):
                         continue
                 else:
-                    if username.lower() != infos.user.username.lower():
+                    if not infos.user.username:
+                        continue
+                    if identifier.lower() != infos.user.username.lower():
                         continue
 
             if _t_type_elaborators[t_type_elaborator](infos, trigger):

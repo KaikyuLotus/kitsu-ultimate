@@ -164,14 +164,15 @@ def execute(reply: str, infos, markup=None):
             methods.send_doc(infos.bot.token, infos.chat.cid, media_id, reply_markup=markup)
         return
 
-    reply, quote = parse(reply, infos)
+    reply, quote, markdown = parse(reply, infos)
 
     log.d("Sending message")
     return methods.send_message(infos.bot.token, infos.chat.cid, reply,
-                                parse_mode="markdown", reply_markup=markup)
+                                parse_mode="markdown" if markdown else None,
+                                reply_markup=markup)
 
 
-def parse(reply: str, infos) -> (str, bool):
+def parse(reply: str, infos) -> (str, bool, bool):
     log.d("Parsing reply string")
     reply = parse_sections(reply, infos)
     reply = parse_dummies(reply, infos)
@@ -182,6 +183,9 @@ def parse(reply: str, infos) -> (str, bool):
         reply = re.sub(reg, str(random.randint(int(min), int(max))), reply, count=1)
 
     quote = "[quote]" in reply
+    markdown = "[md]" in reply
+
+    reply = reply.replace("[md]", "")
     reply = reply.replace("[quote]", "")
 
-    return reply, quote
+    return reply, quote, markdown
