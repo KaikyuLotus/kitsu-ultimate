@@ -8,7 +8,7 @@ from entities import user, group
 from telegram import methods
 
 maker_owner_id = 487353090
-
+_default_language = "IT"
 
 class Infos:
     def __init__(self, bot, update: dict):
@@ -58,7 +58,7 @@ class Infos:
         if self.to_user:
             quoted = self.to_user.uid
 
-        self.db = DB(self.bot.bot_id, gid, uid, quoted)
+        self.db = DB(self.bot.bot_id, gid, uid, quoted, self.chat.is_private)
 
     def _load_callback_query(self, update):
         self.callback_query = CallbackQuery(update["callback_query"], self.bot)
@@ -91,11 +91,10 @@ class Infos:
              reply_markup: str = None,
              parse: bool = True,
              inline: bool = False,
-             msg_id: int = None):
+             msg_id: int = None,
+             force_markdown: bool = False):
 
-        markdown = False
-        if parse:
-            text, quote, markdown = reply_parser.parse(text, self)
+        text, quote, markdown = reply_parser.parse(text, self, not parse)
 
         inline_msg = None
         if inline:
@@ -105,6 +104,9 @@ class Infos:
 
         if not msg_id:
             msg_id = self.message.message_id if not inline else None
+
+        if force_markdown:
+            markdown = True
 
         return methods.edit_message_text(self.bot.token, text,
                                          inline_message_id=inline_msg,
@@ -289,12 +291,13 @@ class Sticker:
 
 
 class DB:
-    def __init__(self, bid, cid, uid, quoted):
+    def __init__(self, bid, cid, uid, quoted, is_private):
         self.bid = bid
 
         self.group = None
         self.user = None
         self.quoted = None
+        self.language = None
 
         # If it's a group
         if cid:
@@ -302,7 +305,7 @@ class DB:
             # If the group doesn't exist
             if not self.group:
                 # Create it and add it
-                self.group = group.Group(cid, [bid])
+                self.group = group.Group(cid, [bid], _default_language)
                 mongo_interface.add_group(self.group)
             else:
                 # Otherwise check if the bot is not present
@@ -323,6 +326,11 @@ class DB:
                 self.quoted = user.User(quoted, [bid], self.group is None)
                 mongo_interface.add_user(self.quoted)
 
+        if is_private:
+            self.language = self.user.language
+        else:
+            self.language = self.group.language
+
     def get_groups_count(self) -> int:
         return len(mongo_interface.get_bot_groups(self.bid))
 
@@ -331,3 +339,12 @@ class DB:
 
     def get_started_users_count(self) -> int:
         return len(mongo_interface.get_known_started_users(self.bid))
+
+    def update_user(self):
+        mongo_interface.update_user_by_id(self.user)
+
+    def update_group(self):
+        mongo_interface.update_group_by_id(self.group)
+
+    def update_quoted_user(self):
+        mongo_interface.update_user_by_id(self.quoted)

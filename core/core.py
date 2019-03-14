@@ -1,8 +1,10 @@
 import time
+from typing import Type
 
 from core import manager
 from core.lowlevel import mongo_interface
 from entities.bot import Bot
+from entities.module_function import ModuleFunction
 from exceptions.kitsu_exception import KitsuException
 from exceptions.telegram_exception import TelegramException
 from exceptions.unauthorized import Unauthorized
@@ -14,6 +16,11 @@ from threading import Thread
 _attached_bots = []
 _main_bot = None
 _running = False
+
+_overrideable_module_function = [
+    ModuleFunction("load_dummies", dict, True)
+    # ModuleFunction("load_dummies", dict, False)
+]
 
 
 def get_maker_bot():
@@ -130,3 +137,35 @@ def attach_bots(tokens: list):
 
 def get_attached_bots():
     return _attached_bots
+
+
+# noinspection PyPep8Naming
+def load_module(Module: Type):
+    module = Module()
+    for function in _overrideable_module_function:
+        if not _elab_module_fun(function, module, Module):
+            log.w(f"Incompatible module, stopping load of {Module.__name__}")
+            break
+
+
+def _elab_module_fun(function, instance, Module):
+    if not hasattr(instance, function.name):
+        if not function.optional:
+            log.w(f"{Module.__name__} has no function {function.name}")
+        return function.optional
+
+    real_function = getattr(instance, function.name)
+    if not callable(real_function):
+        if not function.optional:
+            log.w(f"{Module.__name__}.{function.name} is not a function")
+        return function.optional
+
+    return_value = real_function()
+    if type(return_value) is not function.type:
+        log.w(f"{Module.__name__}.{function.name} returns '{type(return_value).__name__}',"
+              f" '{type(function.type).__name__}' is required")
+        return False
+
+    log_string = function.elaborate_data(return_value)
+    log.i(f"Module: {log_string}")
+    return True

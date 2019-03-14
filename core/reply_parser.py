@@ -3,6 +3,7 @@ import threading
 import time
 import re
 
+from inspect import signature
 from random import choice
 
 # Eval imports
@@ -44,7 +45,9 @@ dummies = {
         "{exec_time}": "ping(infos)",
         "{stats.read}": "manager.get_read_messages(infos.bot.bot_id)",
         "{stats.sent}": "manager.get_sent_messages(infos.bot.bot_id)",
-        "<drop_users>": "advanced_dummies.drop_users()"
+        "<drop_users>": "advanced_dummies.drop_users()",
+        "<to_en>": "advanced_dummies.to_en(infos)",
+        "<to_it>": "advanced_dummies.to_it(infos)"
     },
 
     "$on_reply": {
@@ -70,12 +73,21 @@ def parse_dummies(reply: str, infos) -> str:
 
         for dummy in dummies[dummy_t]:
             if dummy in reply:
-                if dummy.startswith("<") and dummy.endswith(">"):
+                if dummy.startswith(">") and dummy.endswith("<"):
                     if not infos.user.is_maker_owner:
                         continue
                 # eval is dangerous but here it's totally under control
-                reply = reply.replace(dummy, str(eval(dummies[dummy_t][dummy])))
-
+                to_execute = dummies[dummy_t][dummy]
+                if isinstance(to_execute, str):
+                    reply = reply.replace(dummy, str(eval(to_execute)))
+                elif callable(to_execute):
+                    sign = signature(to_execute)
+                    if len(sign.parameters) == 1:
+                        reply = reply.replace(dummy, str(to_execute(infos)))
+                    else:
+                        reply = reply.replace(dummy, str(to_execute()))
+                else:
+                    log.w("Unknown dummy execution type")
     return reply
 
 
@@ -92,7 +104,7 @@ def parse_str_dummies(reply: str, infos) -> str:
 def parse_sections(reply: str, infos) -> str:
     for section in re.findall(r"\${(.*?)}", reply):
         log.d(f"Section '{section}' found")
-        dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section)
+        dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section, infos.db.language)
 
         if not dialogs:
             sub = "-"
@@ -112,7 +124,7 @@ def elaborate_multx(reply: str, infos):
         # TODO this can cause loops
         log.d(f"Action: {action}, var: {var}")
         if action == "send" or action == "edit":
-            dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, var)
+            dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, var, infos.db.language)
             if not dialogs:
                 log.d(f"No dialogs for section {var}")
                 continue
@@ -142,7 +154,6 @@ def elaborate_multx(reply: str, infos):
 
 def execute(reply: str, infos, markup=None):
     if re.search(r"^\[.+]$", reply):
-        # (send|action|wait):(?:(.+?)(?:then|]))
         threading.Thread(target=elaborate_multx, args=(reply, infos)).start()
         return
 
@@ -166,21 +177,31 @@ def execute(reply: str, infos, markup=None):
 
     reply, quote, markdown = parse(reply, infos)
 
+    if reply == "":
+        log.d("Ignoring empty message")
+        return
+
     log.d("Sending message")
     return methods.send_message(infos.bot.token, infos.chat.cid, reply,
                                 parse_mode="markdown" if markdown else None,
                                 reply_markup=markup)
 
 
-def parse(reply: str, infos) -> (str, bool, bool):
-    log.d("Parsing reply string")
-    reply = parse_sections(reply, infos)
-    reply = parse_dummies(reply, infos)
-    reply = parse_str_dummies(reply, infos)
-
+def parse_rnd(reply):
     reg = r"rnd\[(\d+),\s*?(\d+)]"
-    for min, max in re.findall(reg, reply):
-        reply = re.sub(reg, str(random.randint(int(min), int(max))), reply, count=1)
+    for minn, maxx in re.findall(reg, reply):
+        reply = re.sub(reg, str(random.randint(int(minn), int(maxx))), reply, count=1)
+    return reply
+
+
+def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool):
+
+    if not only_formatting:
+        log.d("Parsing reply string")
+        reply = parse_sections(reply, infos)
+        reply = parse_dummies(reply, infos)
+        reply = parse_str_dummies(reply, infos)
+        reply = parse_rnd(reply)
 
     quote = "[quote]" in reply
     markdown = "[md]" in reply

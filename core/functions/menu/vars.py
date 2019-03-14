@@ -3,3 +3,10 @@ trigger_callback_type_list = ["t_type_interaction",
                               "t_type_content",
                               "t_type_equal",
                               "t_type_eteraction"]
+media_types = {
+    "stk": "Sticker",
+    "pht": "Photo",
+    "aud": "Audio",
+    "voe": "Voice",
+    "doc": "Document"
+}

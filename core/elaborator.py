@@ -35,7 +35,7 @@ def complete_dialog(infos: Infos, trigger: Trigger):
     section: str = trigger.section
     log.d(f"Elaborating reply of section {section}")
     dialogs: List[Dialog] = mongo_interface.get_dialogs_of_section(
-        infos.bot.bot_id, section)
+        infos.bot.bot_id, section, infos.db.language)
 
     if not dialogs:
         log.d(f"No dialogs set for section {section}")
@@ -96,7 +96,8 @@ def elaborate(infos: Infos):
 
     for t_type_elaborator in _t_type_elaborators:
         triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id,
-                                                        t_type_elaborator)
+                                                        t_type_elaborator,
+                                                        infos.db.language)
         for trigger in triggers:
             if "@" in trigger.trigger:
                 trigger.trigger, identifier = trigger.trigger.split("@")
@@ -118,7 +119,6 @@ def command(infos: Infos):
         log.d(f"User issued command {infos.message.command}")
         _commands[infos.message.command](infos)
         return True
-
     return False
 
 
@@ -136,7 +136,7 @@ def owner_command(infos: Infos):
 
 def maker_command(infos: Infos):
     if not infos.bot.is_maker:
-        return
+        return False
 
     if infos.message.command in _maker_commands:
         log.d(f"{infos.user.uid} issued maker "
@@ -149,7 +149,7 @@ def maker_command(infos: Infos):
 
 def maker_master_command(infos: Infos):
     if not infos.user.is_maker_owner:
-        return
+        return False
 
     if infos.message.command in _maker_master_commands:
         log.d(f"Maker owner issued command {infos.message.command}")

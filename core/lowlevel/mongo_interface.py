@@ -33,6 +33,8 @@ _mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=tr
 _client = None
 _singleton_lock = Lock()
 
+_default_language = "IT"
+
 
 # region MongoCore
 def _get_client():
@@ -108,6 +110,8 @@ def register_bot(token: str, owner_id: int):
         # TODO implement languages
         "language": "IT"
     })
+
+
 # endregion
 
 
@@ -126,25 +130,11 @@ def get_stats(bot_id: int) -> Stats:
 
 # TODO clean DB and remove compatibility if
 def increment_trigger_usages(trigger: Trigger):
-    if trigger.usages == 0:
-        n_trigger = dict(trigger)
-        n_trigger["usages"] = 1
-        o_trigger = dict(trigger)
-        del o_trigger["usages"]
-        replace_trigger(o_trigger, n_trigger)
-    else:
-        update_trigger(trigger, {"$inc": {"usages": 1}})
+    update_trigger(trigger, {"$inc": {"usages": 1}})
 
 
 def increment_dialog_usages(dialog: Dialog):
-    if dialog.usages == 0:
-        n_dialog = dict(dialog)
-        n_dialog["usages"] = 1
-        o_dialog = dict(dialog)
-        del o_dialog["usages"]
-        replace_dialog(o_dialog, n_dialog)
-    else:
-        update_dialog(dialog, {"$inc": {"usages": 1}})
+    update_dialog(dialog, {"$inc": {"usages": 1}})
 
 
 # TODO increment with $inc (https://stackoverflow.com/questions/27707365/how-to-increment-a-field-in-mongodb)
@@ -160,39 +150,47 @@ def increment_read_messages(bot_id: int):
     update_stats(bot_id, stats)
 
 
-def get_dialogs_of_section(bot_id: int, section: str) -> List[Dialog]:
+def get_dialogs_of_section(bot_id: int, section: str, language=_default_language) -> List[Dialog]:
+    log.d(f"Getting dialogs of bot {bot_id} from section {section} with lang {language}")
     return [Dialog.from_json(dialog) for dialog in _get_db().dialogs.find({
         "bot_id": bot_id,
-        "section": section
+        "section": section,
+        "language": language
     })]
 
 
-def get_triggers_of_type(bot_id: int, t_type: str) -> List[Trigger]:
-    return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
-        "bot_id": bot_id,
-        "type": t_type
-    })]
-
-
-def get_triggers_of_section(bot_id: int, section: str) -> List[Trigger]:
-    return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
-        "bot_id": bot_id,
-        "section": section
-    })]
-
-
-def get_triggers_of_type_and_section(bot_id: int, t_type: str, section: str) \
-        -> List[Trigger]:
+def get_triggers_of_type(bot_id: int, t_type: str, language=_default_language) -> List[Trigger]:
+    log.d(f"Getting triggers of bot {bot_id} of type {t_type} with lang {language}")
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
         "bot_id": bot_id,
         "type": t_type,
-        "section": section
+        "language": language
     })]
 
 
-def get_sections(bot_id: int):
-    triggers = get_triggers(bot_id)
-    dialogs = get_dialogs(bot_id)
+def get_triggers_of_section(bot_id: int, section: str, language=_default_language) -> List[Trigger]:
+    log.d(f"Getting triggers of bot {bot_id} from section {section} with lang {language}")
+    return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
+        "bot_id": bot_id,
+        "section": section,
+        "language": language
+    })]
+
+
+def get_triggers_of_type_and_section(bot_id: int, t_type: str, section: str, language=_default_language) \
+        -> List[Trigger]:
+    log.d(f"Getting triggers of bot {bot_id} of type {t_type} and section {section} with lang {language}")
+    return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
+        "bot_id": bot_id,
+        "type": t_type,
+        "section": section,
+        "language": language
+    })]
+
+
+def get_sections(bot_id: int, language=_default_language):
+    triggers = get_triggers(bot_id, language)
+    dialogs = get_dialogs(bot_id, language)
 
     t_sections = [trigger.section for trigger in triggers]
     d_sections = [dialog.section for dialog in dialogs]
@@ -207,23 +205,27 @@ def get_sections(bot_id: int):
     return x
 
 
-def get_dialogs_count(bot_id: int) -> int:
-    return _get_db().dialogs.find({"bot_id": bot_id}).count()
+def get_dialogs_count(bot_id: int, language=_default_language) -> int:
+    return _get_db().dialogs.find({"bot_id": bot_id,
+                                   "language": language}).count()
 
 
-def get_triggers_count(bot_id: int) -> int:
-    return _get_db().triggers.find({"bot_id": bot_id}).count()
+def get_triggers_count(bot_id: int, language=_default_language) -> int:
+    return _get_db().triggers.find({"bot_id": bot_id,
+                                    "language": language}).count()
 
 
-def get_triggers(bot_id: int):
+def get_triggers(bot_id: int, language=_default_language):
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
-        "bot_id": bot_id
+        "bot_id": bot_id,
+        "language": language
     })]
 
 
-def get_dialogs(bot_id: int) -> List[Dialog]:
+def get_dialogs(bot_id: int, language=_default_language) -> List[Dialog]:
     return [Dialog.from_json(dialog) for dialog in _get_db().dialogs.find({
-        "bot_id": bot_id
+        "bot_id": bot_id,
+        "language": language
     })]
 
 
@@ -232,18 +234,6 @@ def add_trigger(trigger: Trigger): _get_db().triggers.insert_one(dict(trigger))
 
 
 def add_dialog(dialog: Dialog): _get_db().dialogs.insert_one(dict(dialog))
-
-
-def get_bot_triggers(bot_id: int) -> List[Trigger]:
-    return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
-        "bot_id": bot_id
-    })]
-
-
-def get_bot_dialogs(bot_id: int) -> List[Dialog]:
-    return [Dialog.from_json(dialog) for dialog in _get_db().dialogs.find({
-        "bot_id": bot_id
-    })]
 
 
 def replace_dialog(old_dialog: Dialog, new_dialog: Union[Dialog, dict]):
@@ -265,28 +255,32 @@ def update_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
 def delete_dialog(dialog: Dialog): _get_db().dialogs.delete_one(dict(dialog))
 
 
-def delete_dialogs_of_section(bot_id: int, section: str):
+def delete_dialogs_of_section(bot_id: int, section: str, language=_default_language):
     _get_db().dialogs.delete_many({
         "section": section,
-        "bot_id": bot_id
+        "bot_id": bot_id,
+        "language": language
     })
 
 
 def delete_trigger(trigger: Trigger): _get_db().triggers.delete_one(dict(trigger))
 
 
-def delete_triggers_of_section(bot_id: int, section: str):
+def delete_triggers_of_section(bot_id: int, section: str, language=_default_language):
     _get_db().triggers.delete_many({
         "section": section,
-        "bot_id": bot_id
+        "bot_id": bot_id,
+        "language": language
     })
 
 
 def add_group(group: Group):
+    log.d(f"Adding group {group.cid}")
     _get_db().groups.insert_one(dict(group))
 
 
 def delete_group(group: Group):
+    log.d(f"Deleting group {group.cid}")
     _get_db().groups.delete_one(dict(group))
 
 
@@ -305,18 +299,22 @@ def get_bot_groups(bid: int) -> List[Group]:
 
 
 def update_group(old_group: Group, new_group: Group):
+    log.d(f"Updating group {new_group.cid}")
     _get_db().groups.update_one(dict(old_group), dict(new_group))
 
 
 def update_group_by_id(new_group: Group):
+    log.d(f"Updating group by ID {new_group.cid}")
     _get_db().groups.replace_one({"cid": new_group.cid}, dict(new_group))
 
 
 def add_user(user: User):
+    log.d(f"Adding user {user.uid}")
     _get_db().users.insert_one(dict(user))
 
 
 def delete_user(user: User):
+    log.d(f"Deleting user {user.uid}")
     _get_db().users.delete_one(dict(user))
 
 
@@ -355,3 +353,10 @@ def drop_users():
 
 def drop_groups():
     _get_db().groups.drop()
+
+
+def drop_triggers():
+    _get_db().triggers.drop()
+
+def drop_dialogs():
+    _get_db().dialogs.drop()
