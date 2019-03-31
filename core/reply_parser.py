@@ -45,6 +45,9 @@ dummies = {
         "{exec_time}": "ping(infos)",
         "{stats.read}": "manager.get_read_messages(infos.bot.bot_id)",
         "{stats.sent}": "manager.get_sent_messages(infos.bot.bot_id)",
+        "{stats.uptime.date}": "advanced_dummies.uptime_date(infos)",
+        "{stats.uptime.hour}": "advanced_dummies.uptime_hour(infos)",
+        "{stats.uptime.days}": "advanced_dummies.uptime_days(infos)",
         "<drop_users>": "advanced_dummies.drop_users()",
         "<to_en>": "advanced_dummies.to_en(infos)",
         "<to_it>": "advanced_dummies.to_it(infos)"

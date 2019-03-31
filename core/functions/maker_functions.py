@@ -1,4 +1,3 @@
-from core import core, manager
 from core.lowlevel import mongo_interface
 # from entities.bot import Bot
 from entities.infos import Infos
@@ -21,9 +20,9 @@ def token_callback(infos: Infos):
     infos.bot.cancel_wait()
     mongo_interface.register_bot(infos.message.text, infos.user.uid)
 
-    if not core.attach_bot_by_token(infos.message.text):
-        return infos.reply("Something went wrong while creating "
-                           "the bot, please check your token...")
+    #if not lotus.attach_bot_by_token(infos.message.text):
+    #    return infos.reply("Something went wrong while creating "
+    #                       "the bot, please check your token...")
 
     infos.reply("Valid token! Your bot should be online now!")
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import date
 from random import choice
 
 from core import reply_parser
@@ -8,6 +10,7 @@ from logger import log
 def drop_users():
     mongo_interface.drop_users()
     return "Users dropped successffully"
+
 
 def to_en(infos):
     if infos.chat.is_private:
@@ -45,3 +48,14 @@ def to_it(infos):
 
     reply_parser.execute(choice(dialogs).reply, infos)
     return ""
+
+
+def uptime_date(infos): return datetime.fromtimestamp(infos.bot.start_time).strftime("%d/%m/%Y")
+
+
+def uptime_hour(infos): return datetime.fromtimestamp(infos.bot.start_time).strftime("%H:%M:%S")
+
+
+def uptime_days(infos):
+    since = infos.bot.start_time
+    return str((date.today() - date.fromtimestamp(since)).days)

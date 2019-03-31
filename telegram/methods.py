@@ -2,6 +2,7 @@ import json
 
 import requests
 
+from entities.file import File
 from exceptions.conflict import Conflict
 from exceptions.bad_request import BadRequest
 from exceptions.forbidden import Forbidden
@@ -24,6 +25,37 @@ def execute(token: str, method: str, params: dict = None):
             error,
             [key for key in params],
             [params[key] for key in params]]
+
+    if status_code == 409:
+        raise Conflict(*args)
+
+    if status_code == 404:
+        raise NotFound(*args)
+
+    if status_code == 403:
+        raise Forbidden(*args)
+
+    if status_code == 401:
+        raise Unauthorized(*args)
+
+    if status_code == 400:
+        raise BadRequest(*args)
+
+    raise TelegramException(*args)
+
+
+def download(token: str, path: str):
+    response = requests.get(f"https://api.telegram.org/file/bot{token}/{path}")
+
+    status_code = response.status_code
+
+    args = ["Cannot get file",
+            "Unknown error",
+            ["token", "path"],
+            [token, path]]
+
+    if status_code == 200:
+        return response.content
 
     if status_code == 409:
         raise Conflict(*args)
@@ -196,6 +228,20 @@ def delete_message(token: str, chat_id: int, message_id: int):
     return execute(token, "deleteMessage", {
         "message_id": message_id,
         "chat_id": chat_id
+    })
+
+
+def get_file(token: str, file_id: str):
+    return File.from_json(execute(token, "getFile", {
+        "file_id": file_id
+    }))
+
+
+def kick_chat_member(token: str, chat_id: int, user_id: int, until_date: int) -> File:
+    return execute(token, "kickChatMember", {
+        "chat_id": chat_id,
+        "user_id": user_id,
+        "until_date": until_date
     })
 
 

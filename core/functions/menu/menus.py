@@ -6,7 +6,7 @@ from core.lowlevel import mongo_interface
 from entities.dialog import Dialog
 from entities.infos import Infos
 from entities.trigger import Trigger
-from utils import keyboards
+from utils import keyboards, regex_utils
 
 
 # FLOW
@@ -69,7 +69,7 @@ def make_dialogs_list(dialogs: List[Dialog]) -> str:
     out = ""
     i = 1
     for dialog in dialogs:
-        out += f"{i}] {check_reply_media(dialog.reply)} ({dialog.usages} usages)\n"
+        out += f"{i}] {check_reply_media(dialog.reply)} [{dialog.probability}%] ({dialog.usages} usages)\n"
         i += 1
     return out
 
@@ -314,9 +314,13 @@ def wait_del_dialog_reply(infos: Infos) -> Callable:
         infos.reply("Unsupported.")
         return wait_del_dialog_reply
 
+    probability, reply = regex_utils.get_dialog_probability(reply)
+    if probability is None:
+        probability = 100
+
     section = infos.bot.waiting_data["section"]
 
-    dialog = Dialog(reply, section, infos.db.language, infos.bot.bot_id)
+    dialog = Dialog(reply, section, infos.db.language, infos.bot.bot_id, 0, probability)
     mongo_interface.add_dialog(dialog)
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section, infos.db.language)
 
@@ -572,6 +576,24 @@ def del_section(infos: Infos) -> Callable:
     return wait_del_section_number
 
 
+def menu_options(infos: Infos):
+    if not infos.is_callback_query:
+        return menu_options
+
+    if infos.callback_query.data == "options_autom":
+        infos.bot.automs_enabled = not infos.bot.automs_enabled
+        mongo_interface.update_bot(infos.bot.token, infos.bot)
+        infos.edit("Option changed!",
+                   reply_markup=keyboards.menu_options(infos.bot),
+                   parse=False)
+        return menu_options
+
+    if infos.callback_query.data == "options_back":
+        return to_menu(infos)
+
+    return menu_options
+
+
 def menu_sections(infos: Infos):
     if not infos.is_callback_query:
         return menu_triggers
@@ -621,6 +643,12 @@ def menu_choice(infos: Infos) -> Optional[Callable]:
                    reply_markup=keyboards.menu_sections(),
                    parse=False)
         return menu_sections
+
+    if infos.callback_query.data == "menu_options":
+        infos.edit(f"You want to edit some options, master?",
+                   reply_markup=keyboards.menu_options(infos.bot),
+                   parse=False)
+        return menu_options
 
     if infos.callback_query.data == "menu_close":
         infos.delete_message(infos.chat.cid, infos.message.message_id)

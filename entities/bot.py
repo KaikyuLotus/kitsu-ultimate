@@ -1,20 +1,24 @@
 import time
 import traceback
+
 from pprint import pprint
 
-from core import elaborator, reply_parser, core
+import requests
+
+from configuration import configuration
+from core import elaborator, reply_parser
 from core.lowlevel import mongo_interface
 from entities.infos import Infos
 from exceptions.conflict import Conflict
 from exceptions.unauthorized import Unauthorized
 from logger import log
 from telegram import methods
-
-# TODO make a config file
 from utils import regex_utils
 
-_bot_maker_id = 777706082
-_maker_owner_id = 487353090
+_config = configuration.default()
+_bot_maker_id = _config.get_int("defaults.maker_id")
+_maker_owner_id = _config.get_int("defaults.owner_id")
+_connection_retry_time = _config.get_int("connection.retry_time", 5)
 
 
 class Bot:
@@ -24,11 +28,13 @@ class Bot:
         self._callback = None
         self.waiting_data = {}
 
+        self.start_time: int = 0
         self.is_maker: bool = False
         self.username: str = None
         self.name: str = None
         self.owner_id: int = None
         self.clean_start: bool = False
+        self.automs_enabled: bool = False
         self.running: bool = False
         self.offset: int = 0
         self.token: str = token
@@ -36,8 +42,7 @@ class Bot:
         self._load_data()
         self._get_telegram_data()
         self.is_maker = _bot_maker_id == self.bot_id
-        self.regexed_name = regex_utils.string_to_regex(
-            self.name.split(" ")[0].lower())
+        self.regexed_name = regex_utils.string_to_regex(self.name.split(" ")[0].lower())
         log.d("Bot ready")
 
     def _get_telegram_data(self):
@@ -51,6 +56,7 @@ class Bot:
         bot_data = mongo_interface.get_bot_data(self.token)
         self.owner_id = int(bot_data["owner_id"])
         self.clean_start = bot_data["clean_start"]
+        self.automs_enabled = bot_data["automs_enabled"] if "automs_enabled" in bot_data else False
 
     def _update_elaborator(self, update: dict):
         self.offset = update["update_id"] + 1
@@ -68,14 +74,18 @@ class Bot:
                 log.d(f"Calling callback {self._callback.__name__}")
                 self._callback = self._callback(infos)
                 return
-        else:
+        elif infos.user:
             if infos.user.is_bot_owner and self._callback:
                 if infos.message.command == "cancel":
                     self._callback = None
                     infos.reply("Operation cancelled.")
                     return
+            if infos.user.is_bot_owner and infos.message.command == "test":
+                elaborator.elaborate_json_backup(infos)
 
-        if infos.message.is_command:
+        if infos.message.is_document:
+            elaborator.elaborate_file(infos)
+        elif infos.message.is_command:
             mongo_interface.increment_read_messages(self.bot_id)
             self._command_elaborator(infos)
         elif infos.is_callback_query:
@@ -87,13 +97,12 @@ class Bot:
     def _callback_elaborator(self, infos: Infos):
         # Answer if it's not awaited
         log.d("Unawaited callback, answering with default answer")
-        infos.callback_query.answer("Please don't.")
+        infos.callback_query.answer("Sorry, that action is forbidden")
 
     def _message_elaborator(self, infos: Infos):
         elaborator.elaborate(infos)  # Not a command, elaborate the message
 
     def _command_elaborator(self, infos: Infos):
-
         if not elaborator.command(infos):
             if not elaborator.owner_command(infos):
                 # It's a command and not a normal one
@@ -102,28 +111,36 @@ class Bot:
                     elaborator.maker_master_command(infos)
 
     def _updater(self):
+        last_update = None
         try:
             updates = methods.get_updates(self.token, self.offset, 120)
             for update in updates:
+                last_update = update
                 t = time.process_time_ns()
                 self._update_elaborator(update)
                 elapsed_time = (time.process_time_ns() - t) / 1_000_000
                 if elapsed_time > 50:
                     log.w(f"Update #{update['update_id']} elaboration "
                           f"took {elapsed_time} ms")
+            last_update = None
         except Unauthorized:
             log.e(f"Unauthorized bot {self.bot_id}, detaching...")
-            core.detach_bot(self.token)
+            # lotus.detach_bot(self.token)
         except Conflict:
             log.e(f"Telegram said that bot {self.bot_id} is already running, detaching...")
-            core.detach_bot(self.token)
+            # lotus.detach_bot(self.token)
+        except requests.ConnectionError:
+            log.e(f"A connection error happened, waiting {_connection_retry_time} seconds before reconnecting")
+            time.sleep(_connection_retry_time)
         except Exception as e:
             log.e(str(e))
             traceback.print_tb(e.__traceback__)
-            pprint(update)
+            if last_update:
+                pprint(last_update)
 
     def run(self):
         self.running = True
+        self.start_time = time.time()
         log.d("Starting update loop")
         while self.running:
             self._updater()
@@ -152,6 +169,13 @@ class Bot:
     def notify(self, message: str):
         log.d("Sending a notification message to the bot's owner")
         methods.send_message(self.token, _maker_owner_id, message)
+
+    def __iter__(self):
+        yield "token", self.token
+        yield "owner_id", self.owner_id
+        yield "clean_start", self.clean_start
+        yield "username", self.username
+        yield "automs_enabled", self.automs_enabled
 
     def __str__(self):
         return self.token

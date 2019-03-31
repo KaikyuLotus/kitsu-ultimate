@@ -33,7 +33,8 @@ _mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=tr
 _client = None
 _singleton_lock = Lock()
 
-_default_language = "IT"
+_default_language = _config.get("defaults.language", "IT")
+log.d("Default language: " + _default_language)
 
 
 # region MongoCore
@@ -73,6 +74,10 @@ def drop_bots(): _get_bots_collection().drop()
 
 def get_user_bots(user_id: int):
     return list(_get_bots_collection().find({"owner_id": {user_id}}))
+
+
+def update_bot(token: str, bot):
+    _get_db().bots.replace_one({"token": token}, dict(bot))
 
 
 def _get_bot(token: str):
@@ -160,7 +165,6 @@ def get_dialogs_of_section(bot_id: int, section: str, language=_default_language
 
 
 def get_triggers_of_type(bot_id: int, t_type: str, language=_default_language) -> List[Trigger]:
-    log.d(f"Getting triggers of bot {bot_id} of type {t_type} with lang {language}")
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
         "bot_id": bot_id,
         "type": t_type,
@@ -169,7 +173,6 @@ def get_triggers_of_type(bot_id: int, t_type: str, language=_default_language) -
 
 
 def get_triggers_of_section(bot_id: int, section: str, language=_default_language) -> List[Trigger]:
-    log.d(f"Getting triggers of bot {bot_id} from section {section} with lang {language}")
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
         "bot_id": bot_id,
         "section": section,
@@ -179,7 +182,6 @@ def get_triggers_of_section(bot_id: int, section: str, language=_default_languag
 
 def get_triggers_of_type_and_section(bot_id: int, t_type: str, section: str, language=_default_language) \
         -> List[Trigger]:
-    log.d(f"Getting triggers of bot {bot_id} of type {t_type} and section {section} with lang {language}")
     return [Trigger.from_json(trigger) for trigger in _get_db().triggers.find({
         "bot_id": bot_id,
         "type": t_type,
@@ -233,7 +235,13 @@ def get_dialogs(bot_id: int, language=_default_language) -> List[Dialog]:
 def add_trigger(trigger: Trigger): _get_db().triggers.insert_one(dict(trigger))
 
 
+def add_triggers(triggers: List[Trigger]): _get_db().triggers.insert_many([dict(trigger) for trigger in triggers])
+
+
 def add_dialog(dialog: Dialog): _get_db().dialogs.insert_one(dict(dialog))
+
+
+def add_dialogs(dialogs: List[Dialog]): _get_db().dialogs.insert_many([dict(dialog) for dialog in dialogs])
 
 
 def replace_dialog(old_dialog: Dialog, new_dialog: Union[Dialog, dict]):
@@ -357,6 +365,7 @@ def drop_groups():
 
 def drop_triggers():
     _get_db().triggers.drop()
+
 
 def drop_dialogs():
     _get_db().dialogs.drop()

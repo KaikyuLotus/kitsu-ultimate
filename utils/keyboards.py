@@ -41,12 +41,22 @@ def menu_sections():
                                     [back]])
 
 
+def menu_options(bot):
+    symb = "ON" if bot.automs_enabled else "OFF"
+    btn1 = methods.button("Automatic Messages: " + symb, "options_autom")
+    back = methods.button("Back", "options_back")
+    return methods.inline_keyboard([[btn1],
+                                    [back]])
+
+
 def menu():
     btn1 = methods.button("Dialogs", "menu_dialogs")
     btn2 = methods.button("Triggers", "menu_triggers")
     btn3 = methods.button("Sections", "menu_sections")
+    btn4 = methods.button("Options", "menu_options")
     close = methods.button("Close", "menu_close")
     return methods.inline_keyboard([[btn1, btn2, btn3],
+                                    [btn4],
                                     [close]])
 
 

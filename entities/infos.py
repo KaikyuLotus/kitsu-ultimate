@@ -2,13 +2,17 @@ import re
 import time
 from typing import Dict, Optional
 
+from configuration import configuration
 from core import reply_parser
 from core.lowlevel import mongo_interface
 from entities import user, group
+from exceptions.bad_request import BadRequest
 from telegram import methods
 
-maker_owner_id = 487353090
-_default_language = "IT"
+_config = configuration.default()
+_maker_owner_id = _config.get_int("defaults.owner_id")
+_default_language = _config.get("defaults.language", "IT")
+
 
 class Infos:
     def __init__(self, bot, update: dict):
@@ -24,6 +28,7 @@ class Infos:
         self.to_user: User = None
 
         self.is_reply = False
+        self.is_reply_to_this_bot = False
         self.is_message = "message" in update
         self.is_callback_query = "callback_query" in update
         self.is_channel_post = "channel_post" in update
@@ -31,9 +36,14 @@ class Infos:
         self.is_edited_channel_post = "edited_channel_post" in update
         self.update_type = None
 
-        if self.is_message:
+        if self.is_edited_message:
+            update["message"] = update["edited_message"]
+            del update["edited_message"]
+
+        if self.is_message or self.is_edited_message:
+            # Workaround for edited messages
             self._load_message(update["message"], bot)
-            self.update_type = "message"
+            self.update_type = "message" if self.is_message else "edited_message"
         elif self.is_callback_query:
             self._load_callback_query(update)
             self._load_message(update["callback_query"]["message"], bot)
@@ -58,7 +68,8 @@ class Infos:
         if self.to_user:
             quoted = self.to_user.uid
 
-        self.db = DB(self.bot.bot_id, gid, uid, quoted, self.chat.is_private)
+        self.db = DB(self.bot.bot_id, gid, uid, quoted, self.chat.is_private if self.chat else False)
+        self.is_to_bot = (self.is_reply and self.to_user.is_this_bot if self.to_user else False) or self.chat.is_private
 
     def _load_callback_query(self, update):
         self.callback_query = CallbackQuery(update["callback_query"], self.bot)
@@ -78,7 +89,6 @@ class Infos:
     def reply(self, text: str,
               parse: bool = True,
               parse_mode: Optional[str] = "markdown",
-              quote: bool = True,
               markup: Dict = None):
 
         if parse:
@@ -108,13 +118,20 @@ class Infos:
         if force_markdown:
             markdown = True
 
-        return methods.edit_message_text(self.bot.token, text,
-                                         inline_message_id=inline_msg,
-                                         message_id=msg_id,
-                                         chat_id=chat_id,
-                                         parse_mode=parse_mode if markdown else None,
-                                         disable_web_page_preview=disable_web_page_preview,
-                                         reply_markup=reply_markup)
+        try:
+            return methods.edit_message_text(self.bot.token, text,
+                                             inline_message_id=inline_msg,
+                                             message_id=msg_id,
+                                             chat_id=chat_id,
+                                             parse_mode=parse_mode if markdown else None,
+                                             disable_web_page_preview=disable_web_page_preview,
+                                             reply_markup=reply_markup)
+        except BadRequest:
+            return methods.edit_message_text(self.bot.token,
+                                             "Sorry, message was too long, don't try again!",
+                                             inline_message_id=inline_msg,
+                                             message_id=msg_id,
+                                             chat_id=chat_id)
 
     def delete_message(self, chat_id: int = None, message_id: int = None):
         if not chat_id:
@@ -134,7 +151,6 @@ class CallbackQuery:
         self.user = User(callback_query["from"], bot)
         self.chat_instance = callback_query["chat_instance"]
 
-        # TODO Replace dict defaults ?
         self.inline_message_id = None
         if "inline_message_id" in callback_query:
             self.inline_message_id = callback_query["inline_message_id"]
@@ -169,16 +185,17 @@ class Chat:
 
 
 class User:
-    def __init__(self, user: dict, bot):
-        self.name = user["first_name"]
-        self.surname = user["last_name"] if "last_name" in user else None
-        self.username = user["username"] if "username" in user else None
-        self.language_code = user["language_code"] if "language_code" in user else None
+    def __init__(self, usr: dict, bot):
+        self.name = usr["first_name"]
+        self.surname = usr["last_name"] if "last_name" in usr else None
+        self.username = usr["username"] if "username" in usr else None
+        self.language_code = usr["language_code"] if "language_code" in usr else None
 
-        self.uid = user["id"]
-        self.is_bot = user["is_bot"]
+        self.uid = usr["id"]
+        self.is_bot = usr["is_bot"]
+        self.is_this_bot = self.uid == bot.bot_id
         self.is_bot_owner = self.uid == bot.owner_id
-        self.is_maker_owner = self.uid == maker_owner_id
+        self.is_maker_owner = self.uid == _maker_owner_id
 
     def __int__(self):
         return self.uid
@@ -218,14 +235,14 @@ class Message:
 
         self.is_document = "document" in message
         if self.is_document:
-            self.document = Document(message["document"])
+            self.document = Document(message["document"], bot.token)
 
         self.args = []
         self.is_command = False
         self.command = None
         self.is_at_bot = False
 
-        if self.is_text:  # TODO set right regex
+        if self.is_text:  # TODO set right regex?
             match = re.fullmatch(rf"^/(\w+)(@({bot.username}))?( +(.+))?", self.text, re.I)
             if match:
                 self.is_command = True
@@ -245,14 +262,16 @@ class Message:
 
 
 class Document:
-    def __init__(self, document: dict):
-        if "file_name" in document:
-            self.file_name = document["file_name"]
-        else:
-            self.file_name = "file"
-        self.mime_type = document["mime_type"]
-        self.file_size = document["file_size"]
+    def __init__(self, document: dict, token: str):
+        self.token = token
+        self.file_name = document["file_name"] if "file_name" in document else "name"
+        self.mime_type = document["mime_type"] if "mime_type" in document else "mime"
+        self.file_size = document["file_size"] if "file_size" in document else 0
         self.docid = document["file_id"]
+
+    def download(self):
+        path = methods.get_file(self.token, self.docid).file_path
+        return methods.download(self.token, path)
 
 
 class Voice:

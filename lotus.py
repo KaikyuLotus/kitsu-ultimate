@@ -1,10 +1,14 @@
 import time
+import importlib
+
 from typing import Type
 
+from configuration import configuration
 from core import manager
 from core.lowlevel import mongo_interface
 from entities.bot import Bot
 from entities.module_function import ModuleFunction
+from exceptions.configuration_error import ConfigurationError
 from exceptions.kitsu_exception import KitsuException
 from exceptions.telegram_exception import TelegramException
 from exceptions.unauthorized import Unauthorized
@@ -16,6 +20,9 @@ from threading import Thread
 _attached_bots = []
 _main_bot = None
 _running = False
+
+_config = configuration.default()
+
 
 _overrideable_module_function = [
     ModuleFunction("load_dummies", dict, True)
@@ -44,20 +51,45 @@ def _init(bot):
     log.i(f"Bot @{bot.username} ok")
 
 
-def _run_bot(bot: Bot):
+def _run_bot(bot):
     _init(bot)
     Thread(target=bot.run, daemon=True).start()
 
 
 def run(threaded: bool = True, idle: bool = True, auto_attach: bool = True):
     global _running
+
+    log.i("Starting Kitsu Ultimate")
+
+    _load_modules()
+
+    if _config.get_bool("startup.drop.dialogs"):
+        log.i("Dropping dialogs")
+        mongo_interface.drop_dialogs()
+
+    if _config.get_bool("startup.drop.triggers"):
+        log.i("Dropping triggers")
+        mongo_interface.drop_triggers()
+
+    if _config.get_bool("startup.drop.bots"):
+        log.i("Dropping bots")
+        mongo_interface.drop_bots()
+
+    if _config.get_bool("startup.drop.groups"):
+        log.i("Dropping groups")
+        mongo_interface.drop_groups()
+
+    if _config.get_bool("startup.drop.users"):
+        log.i("Dropping users")
+        mongo_interface.drop_users()
+
     if not threaded:
         log.i("Running in webhook mode")
         raise NotImplementedError()
 
     if auto_attach:
         log.d("Auto attaching bots from mongo")
-        attach_bots(manager.get_tokens())
+        attach_bots_from_manager()
 
     log.i("Running attached bots")
     [_run_bot(bot) for bot in _attached_bots]
@@ -96,7 +128,7 @@ def detach_bot(token: str):
     log.i(f"Bot {token} not found")
 
 
-def attach_bot(bot: Bot):
+def attach_bot(bot):
     _attached_bots.append(bot)
     log.i(f"Running bot {bot.bot_id}")
     _run_bot(bot)
@@ -119,6 +151,14 @@ def attach_bot_by_token(token: str):
 
 
 def attach_bots_from_manager():
+    tokens = manager.get_tokens()
+    if not tokens:
+        log.i("Not bots found on database, adding default bot")
+        maker_token = _config.get("defaults.maker_token")
+        owner_id = _config.get("defaults.owner_id")
+        if not maker_token or not owner_id:
+            raise ConfigurationError("No bots on database and configuration file has no default token nor owner id")
+        mongo_interface.register_bot(maker_token, owner_id)
     attach_bots(manager.get_tokens())
 
 
@@ -140,6 +180,19 @@ def get_attached_bots():
 
 
 # noinspection PyPep8Naming
+def _load_modules():
+    for module in _config.get_list("modules.class_list", []):
+        try:
+            log.d(f"Loading module: {module}")
+            if "." in module:
+                class_name = module.split(".")[-1]
+                module = ".".join(module.split(".")[:-1])
+                LoadedModule = getattr(importlib.import_module(module), class_name)
+                load_module(LoadedModule)
+        except Exception as err:
+            log.e(err)
+
+
 def load_module(Module: Type):
     module = Module()
     for function in _overrideable_module_function:
@@ -169,3 +222,7 @@ def _elab_module_fun(function, instance, Module):
     log_string = function.elaborate_data(return_value)
     log.i(f"Module: {log_string}")
     return True
+
+
+if __name__ == "__main__":
+    run()
