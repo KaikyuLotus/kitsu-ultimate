@@ -8,6 +8,8 @@ from random import choice
 
 # Eval imports
 # noinspection PyUnresolvedReferences
+from typing import List, Optional, Dict
+
 from core import manager
 # noinspection PyUnresolvedReferences
 from core.functions import advanced_dummies
@@ -178,7 +180,10 @@ def execute(reply: str, infos, markup=None):
             methods.send_doc(infos.bot.token, infos.chat.cid, media_id, reply_markup=markup)
         return
 
-    reply, quote, markdown = parse(reply, infos)
+    reply, quote, markdown, markup_msg = parse(reply, infos)
+
+    if not markup and markup_msg:
+        markup = markup_msg
 
     if reply == "":
         log.d("Ignoring empty message")
@@ -197,14 +202,21 @@ def parse_rnd(reply):
     return reply
 
 
-def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool):
+def parse_buttons(reply: str) -> [str, Optional[Dict]]:
+    btns = []
+    for row in re.findall(r"\[(.+?)\]", reply):
+        btn_row = []
+        for link, text in re.findall(r"<btn:(.+?)\|(.+?)>", row):
+            btn_row.append(methods.link_button(text, link))
+        btns.append(btn_row)
 
-    if not only_formatting:
-        log.d("Parsing reply string")
-        reply = parse_sections(reply, infos)
-        reply = parse_dummies(reply, infos)
-        reply = parse_str_dummies(reply, infos)
-        reply = parse_rnd(reply)
+    reply = re.sub(r"\[(.+?)\]", "", reply)
+    return reply, methods.inline_keyboard(btns) if btns else None
+
+
+def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, List):
+
+    mkup = None
 
     quote = "[quote]" in reply
     markdown = "[md]" in reply
@@ -212,4 +224,12 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool):
     reply = reply.replace("[md]", "")
     reply = reply.replace("[quote]", "")
 
-    return reply, quote, markdown
+    if not only_formatting:
+        log.d("Parsing reply string")
+        reply = parse_sections(reply, infos)
+        reply = parse_dummies(reply, infos)
+        reply = parse_str_dummies(reply, infos)
+        reply = parse_rnd(reply)
+        reply, mkup = parse_buttons(reply)
+
+    return reply, quote, markdown, mkup

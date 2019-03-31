@@ -10,6 +10,10 @@ def string_to_regex(string: str):
     return string
 
 
+def is_command(string: str, symbol: str, command: str):
+    return True if re.search(rf"{re.escape(symbol)}{re.escape(command)}( .+)?", string, flags=re.I) else False
+
+
 # Better return a boolean than a match object
 def is_interaction(string: str, bot_name: str):
     return True if re.search(rf"(^{bot_name}\b)|(\b{bot_name}\W*$)",

@@ -104,7 +104,10 @@ class Infos:
              msg_id: int = None,
              force_markdown: bool = False):
 
-        text, quote, markdown = reply_parser.parse(text, self, not parse)
+        text, quote, markdown, markup = reply_parser.parse(text, self, not parse)
+
+        if not reply_markup and markup:
+            reply_markup = markup
 
         inline_msg = None
         if inline:

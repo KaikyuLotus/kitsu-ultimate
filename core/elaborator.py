@@ -21,9 +21,6 @@ _autom_choice = _config.get("autom.choice", 10)
 _backup_password = _config.get("backup.password", "")
 
 _commands = {
-    "bid": functions.bid,
-    "start": functions.start,
-    "uid": functions.uid
 }
 
 _owner_commands = {
@@ -112,11 +109,20 @@ def elaborate_eteraction(infos: Infos, eteraction: Trigger):
             return complete_dialog(infos, eteraction)
 
 
+def elaborate_command(infos: Infos, command: Trigger):
+    is_command = regex_utils.is_command(infos.message.text,
+                                        infos.bot.custom_command_symb,
+                                        command.trigger)
+    if is_command:
+        return complete_dialog(infos, command)
+
+
 _t_type_elaborators = {
     "equal": elaborate_equal,
     "content": elaborate_content,
     "interaction": elaborate_interaction,
-    "eteraction": elaborate_eteraction
+    "eteraction": elaborate_eteraction,
+    "command": elaborate_command
 }
 
 
@@ -151,6 +157,13 @@ def elaborate(infos: Infos):
 
 
 def command(infos: Infos):
+
+    if infos.bot.custom_command_symb == "/":
+        triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id, "command", infos.db.language)
+        for trigger in triggers:
+            if elaborate_command(infos, trigger):
+                return
+
     if infos.message.command in _commands:
         log.d(f"User issued command {infos.message.command}")
         _commands[infos.message.command](infos)
@@ -240,6 +253,7 @@ def elaborate_triggers(triggers: dict, infos: Infos):
         actual_triggers = triggers[t_type]
         section = None
 
+        # TODO add support for importing commands
         if t_type == "equals":
             t_type = "equal"
 

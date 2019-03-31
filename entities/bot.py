@@ -2,6 +2,7 @@ import time
 import traceback
 
 from pprint import pprint
+from typing import List
 
 import requests
 
@@ -37,6 +38,7 @@ class Bot:
         self.automs_enabled: bool = False
         self.running: bool = False
         self.offset: int = 0
+        self.custom_command_symb = "/"
         self.token: str = token
         self.bot_id: int = int(token.split(":")[0])
         self._load_data()
@@ -57,6 +59,7 @@ class Bot:
         self.owner_id = int(bot_data["owner_id"])
         self.clean_start = bot_data["clean_start"]
         self.automs_enabled = bot_data["automs_enabled"] if "automs_enabled" in bot_data else False
+        self.custom_command_symb = bot_data["command_symb"] if "command_symb" in bot_data else "/"
 
     def _update_elaborator(self, update: dict):
         self.offset = update["update_id"] + 1
@@ -155,16 +158,17 @@ class Bot:
         self.waiting_data = {}
         log.d("Waiting cancelled")
 
-    def reply(self, infos: Infos, text: str, quote: bool = True, markdown: bool = False):
+    def reply(self, infos: Infos, text: str, quote: bool = True, markdown: bool = False, markup: List = None):
         log.d("Replying with a message")
         methods.send_message(self.token, infos.chat.cid, text,
                              reply_to_message_id=infos.message.message_id
                              if quote else None,
-                             parse_mode="markdown" if markdown else None)
+                             parse_mode="markdown" if markdown else None,
+                             reply_markup=markup)
 
     def execute_reply(self, infos: Infos, reply: str):
-        reply, quote, markdown = reply_parser.parse(reply, infos)
-        self.reply(infos, reply, quote=quote, markdown=markdown)
+        reply, quote, markdown, markup = reply_parser.parse(reply, infos)
+        self.reply(infos, reply, quote=quote, markdown=markdown, markup=markup)
 
     def notify(self, message: str):
         log.d("Sending a notification message to the bot's owner")
@@ -176,6 +180,7 @@ class Bot:
         yield "clean_start", self.clean_start
         yield "username", self.username
         yield "automs_enabled", self.automs_enabled
+        yield "command_symb", self.custom_command_symb
 
     def __str__(self):
         return self.token

@@ -1,7 +1,7 @@
 import re
 from typing import Callable, List, Optional
 
-from core.functions.menu.vars import media_types
+from core.functions.menu.vars import media_types, trigger_type_list
 from core.lowlevel import mongo_interface
 from entities.dialog import Dialog
 from entities.infos import Infos
@@ -104,17 +104,11 @@ def read_trigger(infos: Infos) -> Callable:
 
 
 def select_trigger_type(infos: Infos):
-    if infos.callback_query.data == "interaction":
-        sel_type = "interaction"
-    elif infos.callback_query.data == "content":
-        sel_type = "content"
-    elif infos.callback_query.data == "eteraction":
-        sel_type = "eteraction"
-    elif infos.callback_query.data == "equal":
-        sel_type = "equal"
-    else:
+    if infos.callback_query.data not in trigger_type_list:
         infos.callback_query.answer("What...?")
         sel_type = None
+    else:
+        sel_type = infos.callback_query.data
 
     return sel_type
 
@@ -576,6 +570,28 @@ def del_section(infos: Infos) -> Callable:
     return wait_del_section_number
 
 
+def menu_wait_command_symbol(infos: Infos):
+    if infos.is_callback_query:
+        if infos.callback_query.data == "cancel":
+            return to_menu(infos, "Operation cancelled\nDo you need something else?")
+
+    if len(infos.message.text) != 1:
+        infos.edit("Invalid symbol specified!\nPlease send just a symbol",
+                   msg_id=infos.bot.waiting_data["msg"].message_id,
+                   reply_markup=keyboards.cancel(),
+                   parse=False)
+        return menu_wait_command_symbol
+
+    infos.bot.custom_command_symb = infos.message.text
+    mongo_interface.update_bot(infos.bot.token, infos.bot)
+
+    infos.edit(f"You want to edit some options, master?",
+               msg_id=infos.bot.waiting_data["msg"].message_id,
+               reply_markup=keyboards.menu_options(infos.bot),
+               parse=False)
+    return menu_options
+
+
 def menu_options(infos: Infos):
     if not infos.is_callback_query:
         return menu_options
@@ -587,6 +603,12 @@ def menu_options(infos: Infos):
                    reply_markup=keyboards.menu_options(infos.bot),
                    parse=False)
         return menu_options
+
+    if infos.callback_query.data == "options_comm_symbol":
+        infos.edit("Please send a custom command symbol",
+                   reply_markup=keyboards.cancel(),
+                   parse=False)
+        return menu_wait_command_symbol
 
     if infos.callback_query.data == "options_back":
         return to_menu(infos)

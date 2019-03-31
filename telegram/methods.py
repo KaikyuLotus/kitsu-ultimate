@@ -250,6 +250,10 @@ def button(text: str, data: str):
     return {"text": text, "callback_data": data}
 
 
+def link_button(text: str, link: str):
+    return {"text": text, "url": link}
+
+
 def inline_keyboard(btns):
     return json.dumps({"inline_keyboard": btns})
 

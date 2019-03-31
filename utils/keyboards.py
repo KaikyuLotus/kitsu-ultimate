@@ -6,9 +6,11 @@ def trigger_type():
     btn2 = methods.button("Content", "content")
     btn3 = methods.button("Equal", "equal")
     btn4 = methods.button("Eteraction", "eteraction")
+    btn5 = methods.button("Command", "command")
     btn_canc = methods.button("Cancel", "cancel")
     return methods.inline_keyboard([[btn1, btn2],
                                     [btn3, btn4],
+                                    [btn5],
                                     [btn_canc]])
 
 
@@ -43,9 +45,12 @@ def menu_sections():
 
 def menu_options(bot):
     symb = "ON" if bot.automs_enabled else "OFF"
-    btn1 = methods.button("Automatic Messages: " + symb, "options_autom")
+    c_symb = bot.custom_command_symb
+    btn1 = methods.button(f"Automatic Messages: {symb}", "options_autom")
+    btn2 = methods.button(f"Command Symbol: {c_symb}", "options_comm_symbol")
     back = methods.button("Back", "options_back")
     return methods.inline_keyboard([[btn1],
+                                    [btn2],
                                     [back]])
 
 
@@ -62,4 +67,9 @@ def menu():
 
 def done():
     btn = methods.button("Done", "done")
+    return methods.inline_keyboard([[btn]])
+
+
+def cancel():
+    btn = methods.button("Cancel", "cancel")
     return methods.inline_keyboard([[btn]])
