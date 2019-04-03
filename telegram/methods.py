@@ -94,13 +94,15 @@ def send_message(token: str,
                  text: str,
                  reply_to_message_id: int = None,
                  parse_mode: str = None,
-                 reply_markup: str = None):
+                 reply_markup: str = None,
+                 disable_web_page_preview: bool = None):
     return execute(token, "sendMessage", {
         "text": text,
         "chat_id": chat_id,
         "reply_to_message_id": reply_to_message_id,
         "parse_mode": parse_mode,
-        "reply_markup": reply_markup
+        "reply_markup": reply_markup,
+        "disable_web_page_preview": disable_web_page_preview
     })
 
 

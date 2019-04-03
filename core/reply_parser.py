@@ -50,6 +50,7 @@ dummies = {
         "{stats.uptime.date}": "advanced_dummies.uptime_date(infos)",
         "{stats.uptime.hour}": "advanced_dummies.uptime_hour(infos)",
         "{stats.uptime.days}": "advanced_dummies.uptime_days(infos)",
+        "{/}": "infos.bot.custom_command_symb",
         "<drop_users>": "advanced_dummies.drop_users()",
         "<to_en>": "advanced_dummies.to_en(infos)",
         "<to_it>": "advanced_dummies.to_it(infos)"
@@ -180,7 +181,7 @@ def execute(reply: str, infos, markup=None):
             methods.send_doc(infos.bot.token, infos.chat.cid, media_id, reply_markup=markup)
         return
 
-    reply, quote, markdown, markup_msg = parse(reply, infos)
+    reply, quote, nolink, markdown, markup_msg = parse(reply, infos)
 
     if not markup and markup_msg:
         markup = markup_msg
@@ -192,7 +193,8 @@ def execute(reply: str, infos, markup=None):
     log.d("Sending message")
     return methods.send_message(infos.bot.token, infos.chat.cid, reply,
                                 parse_mode="markdown" if markdown else None,
-                                reply_markup=markup)
+                                reply_markup=markup,
+                                disable_web_page_preview=nolink)
 
 
 def parse_rnd(reply):
@@ -208,28 +210,32 @@ def parse_buttons(reply: str) -> [str, Optional[Dict]]:
         btn_row = []
         for link, text in re.findall(r"<btn:(.+?)\|(.+?)>", row):
             btn_row.append(methods.link_button(text, link))
-        btns.append(btn_row)
-
-    reply = re.sub(r"\[(.+?)\]", "", reply)
+        if btn_row:
+            reply = re.sub(rf"\[({re.escape(row)})\]", "", reply)
+            btns.append(btn_row)
     return reply, methods.inline_keyboard(btns) if btns else None
 
 
-def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, List):
+def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, List):
 
     mkup = None
+    quote = False
+    nolink = False
 
-    quote = "[quote]" in reply
     markdown = "[md]" in reply
-
-    reply = reply.replace("[md]", "")
-    reply = reply.replace("[quote]", "")
+    reply = reply.replace("[md]", "", 1)
 
     if not only_formatting:
-        log.d("Parsing reply string")
+        quote = "[quote]" in reply
+        nolink = "[nolink]" in reply
+
+        reply = reply.replace("[quote]", "")
+        reply = reply.replace("[nolink]", "")
+
         reply = parse_sections(reply, infos)
         reply = parse_dummies(reply, infos)
         reply = parse_str_dummies(reply, infos)
         reply = parse_rnd(reply)
         reply, mkup = parse_buttons(reply)
 
-    return reply, quote, markdown, mkup
+    return reply, quote, nolink, markdown, mkup

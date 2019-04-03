@@ -156,7 +156,6 @@ def increment_read_messages(bot_id: int):
 
 
 def get_dialogs_of_section(bot_id: int, section: str, language=_default_language) -> List[Dialog]:
-    log.d(f"Getting dialogs of bot {bot_id} from section {section} with lang {language}")
     return [Dialog.from_json(dialog) for dialog in _get_db().dialogs.find({
         "bot_id": bot_id,
         "section": section,

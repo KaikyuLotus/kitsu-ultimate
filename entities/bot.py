@@ -158,17 +158,19 @@ class Bot:
         self.waiting_data = {}
         log.d("Waiting cancelled")
 
-    def reply(self, infos: Infos, text: str, quote: bool = True, markdown: bool = False, markup: List = None):
+    def reply(self, infos: Infos, text: str, quote: bool = True,
+              markdown: bool = False, markup: List = None, nolink: bool = False):
         log.d("Replying with a message")
         methods.send_message(self.token, infos.chat.cid, text,
                              reply_to_message_id=infos.message.message_id
                              if quote else None,
                              parse_mode="markdown" if markdown else None,
-                             reply_markup=markup)
+                             reply_markup=markup,
+                             disable_web_page_preview=nolink)
 
     def execute_reply(self, infos: Infos, reply: str):
-        reply, quote, markdown, markup = reply_parser.parse(reply, infos)
-        self.reply(infos, reply, quote=quote, markdown=markdown, markup=markup)
+        reply, quote, nolink, markdown, markup = reply_parser.parse(reply, infos)
+        self.reply(infos, reply, quote=quote, markdown=markdown, markup=markup, nolink=nolink)
 
     def notify(self, message: str):
         log.d("Sending a notification message to the bot's owner")

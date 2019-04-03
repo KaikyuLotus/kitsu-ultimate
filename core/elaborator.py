@@ -15,9 +15,8 @@ from logger import log
 from utils import regex_utils
 
 _config = configuration.default()
-_autom_min = _config.get("autom.min", 1)
-_autom_max = _config.get("autom.max", 100)
-_autom_choice = _config.get("autom.choice", 10)
+_autom_min = _config.get_int("autom.min", 1)
+_autom_max = _config.get_int("autom.max", 100)
 _backup_password = _config.get("backup.password", "")
 
 _commands = {
@@ -43,8 +42,8 @@ def complete_dialog_sec(infos: Infos, section: str):
         infos.bot.bot_id, section, infos.db.language)
 
     if not dialogs:
-        log.d(f"No dialogs set for section {section}")
-        infos.bot.notify(f"No dialogs set for section {section}")
+        log.d(f"No dialogs set for section {section} lang {infos.db.language}")
+        infos.bot.notify(f"No dialogs set for section {section} lang {infos.db.language}")
         return
 
     dialog = choice(dialogs)
@@ -146,23 +145,22 @@ def elaborate(infos: Infos):
             if _t_type_elaborators[t_type_elaborator](infos, trigger):
                 return
 
-    if infos.bot.automs_enabled:
-        log.d("Autom enabled, elaborating...")
-        if randint(_autom_min, _autom_max) == _autom_choice:
-            complete_dialog_sec(infos, "automatics")
-            return
-
     if infos.is_to_bot:
         complete_dialog_sec(infos, "generic")
+
+    if infos.bot.automs_enabled:
+        log.d("Autom enabled, elaborating...")
+        if randint(_autom_min, _autom_max) == _autom_max:
+            complete_dialog_sec(infos, "automatics")
+            return
 
 
 def command(infos: Infos):
 
-    if infos.bot.custom_command_symb == "/":
-        triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id, "command", infos.db.language)
-        for trigger in triggers:
-            if elaborate_command(infos, trigger):
-                return
+    triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id, "command", infos.db.language)
+    for trigger in triggers:
+        if elaborate_command(infos, trigger):
+            return
 
     if infos.message.command in _commands:
         log.d(f"User issued command {infos.message.command}")

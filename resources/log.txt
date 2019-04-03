@@ -1,88 +1,27 @@
-[INFO    ] - 01:31:42 - <module>             -> Getting data from configuration file
-[DEBUG   ] - 01:31:42 - <module>             -> Default language: IT
-[INFO    ] - 01:31:42 - run                  -> Starting Kitsu Ultimate
-[DEBUG   ] - 01:31:42 - _load_modules        -> Loading module: modules.meteo.MeteoModule
-[INFO    ] - 01:31:42 - _elab_module_fun     -> Module: loaded 2 custom dummies
-[INFO    ] - 01:31:42 - run                  -> Dropping dialogs
-[INFO    ] - 01:31:42 - run                  -> Dropping triggers
-[INFO    ] - 01:31:42 - run                  -> Dropping groups
-[INFO    ] - 01:31:42 - run                  -> Dropping users
-[DEBUG   ] - 01:31:42 - run                  -> Auto attaching bots from mongo
-[DEBUG   ] - 01:31:42 - attach_bots          -> Attaching 2 bots
-[DEBUG   ] - 01:31:42 - attach_bot_by_token  -> Attaching bot 558241218:AAGjc6HbQInm0aPJuqAV5VpRZ5wXax75lJU
-[DEBUG   ] - 01:31:42 - __init__             -> Initializing new bot
-[DEBUG   ] - 01:31:42 - _load_data           -> Getting bot data from mongo
-[DEBUG   ] - 01:31:43 - _get_telegram_data   -> Getting bot data from Telegram
-[DEBUG   ] - 01:31:43 - __init__             -> Bot ready
-[DEBUG   ] - 01:31:43 - attach_bot_by_token  -> Bot 558241218 attached successfully
-[DEBUG   ] - 01:31:43 - attach_bot_by_token  -> Attaching bot 764850488:AAFwWEb3PMQq6emkykMnw7cKgM7fL0YpMOM
-[DEBUG   ] - 01:31:43 - __init__             -> Initializing new bot
-[DEBUG   ] - 01:31:43 - _load_data           -> Getting bot data from mongo
-[DEBUG   ] - 01:31:43 - _get_telegram_data   -> Getting bot data from Telegram
-[DEBUG   ] - 01:31:43 - __init__             -> Bot ready
-[DEBUG   ] - 01:31:43 - attach_bot_by_token  -> Bot 764850488 attached successfully
-[INFO    ] - 01:31:43 - run                  -> Running attached bots
-[INFO    ] - 01:31:43 - _init                -> Bot @SyntaxerControllerBot ok
-[DEBUG   ] - 01:31:43 - run                  -> Starting update loop
-[INFO    ] - 01:31:44 - _init                -> Bot @JavyRobot ok
-[DEBUG   ] - 01:31:44 - run                  -> Starting update loop
-[DEBUG   ] - 01:31:47 - add_group            -> Adding group -1001452586260
-[DEBUG   ] - 01:31:47 - add_user             -> Adding user 149677519
-[DEBUG   ] - 01:31:47 - add_user             -> Adding user 367100308
-[DEBUG   ] - 01:31:47 - update_group_by_id   -> Updating group by ID -1001452586260
-[DEBUG   ] - 01:31:50 - add_user             -> Adding user 487353090
-[DEBUG   ] - 01:31:50 - complete_dialog_sec  -> Elaborating reply of section generic
-[DEBUG   ] - 01:31:50 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section generic with lang IT
-[DEBUG   ] - 01:31:50 - complete_dialog_sec  -> No dialogs set for section generic
-[DEBUG   ] - 01:31:50 - notify               -> Sending a notification message to the bot's owner
-[WARNING ] - 01:31:50 - _updater             -> Update #991725880 elaboration took 109.375 ms
-[DEBUG   ] - 01:31:54 - owner_command        -> Owner issued command menu
-[DEBUG   ] - 01:31:54 - cancel_wait          -> Waiting cancelled
-[DEBUG   ] - 01:31:54 - parse                -> Parsing reply string
-[DEBUG   ] - 01:31:54 - execute              -> Sending message
-[DEBUG   ] - 01:32:01 - _update_elaborator   -> Calling callback menu_choice
-[WARNING ] - 01:32:01 - _updater             -> Update #991725884 elaboration took 62.5 ms
-[DEBUG   ] - 01:32:02 - _update_elaborator   -> Calling callback menu_dialogs
-[DEBUG   ] - 01:32:04 - _update_elaborator   -> Calling callback add_dialog
-[DEBUG   ] - 01:32:04 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section uptime with lang IT
-[WARNING ] - 01:32:04 - _updater             -> Update #991725886 elaboration took 78.125 ms
-[DEBUG   ] - 01:32:09 - add_user             -> Adding user 106541117
-[DEBUG   ] - 01:32:09 - add_user             -> Adding user 106541117
-[DEBUG   ] - 01:32:09 - _update_elaborator   -> Calling callback wait_del_dialog_reply
-[DEBUG   ] - 01:32:09 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section uptime with lang IT
-[WARNING ] - 01:32:10 - _updater             -> Update #991725888 elaboration took 140.625 ms
-[DEBUG   ] - 01:32:10 - _update_elaborator   -> Calling callback wait_del_dialog_reply
-[DEBUG   ] - 01:32:11 - cancel_wait          -> Waiting cancelled
-[WARNING ] - 01:32:11 - _updater             -> Update #991725889 elaboration took 62.5 ms
-[DEBUG   ] - 01:32:11 - _update_elaborator   -> Calling callback menu_choice
-[DEBUG   ] - 01:32:12 - _update_elaborator   -> Calling callback menu_triggers
-[DEBUG   ] - 01:32:14 - _update_elaborator   -> Calling callback add_trigger
-[DEBUG   ] - 01:32:16 - _update_elaborator   -> Calling callback wait_trigger_type_add_reply
-[WARNING ] - 01:32:17 - _updater             -> Update #991725894 elaboration took 78.125 ms
-[DEBUG   ] - 01:32:18 - _update_elaborator   -> Calling callback read_trigger
-[WARNING ] - 01:32:18 - _updater             -> Update #991725895 elaboration took 62.5 ms
-[DEBUG   ] - 01:32:19 - _update_elaborator   -> Calling callback read_trigger
-[DEBUG   ] - 01:32:19 - cancel_wait          -> Waiting cancelled
-[DEBUG   ] - 01:32:20 - _update_elaborator   -> Calling callback menu_choice
-[DEBUG   ] - 01:32:23 - complete_dialog_sec  -> Elaborating reply of section uptime
-[DEBUG   ] - 01:32:23 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section uptime with lang IT
-[DEBUG   ] - 01:32:23 - parse                -> Parsing reply string
-[DEBUG   ] - 01:32:23 - execute              -> Sending message
-[WARNING ] - 01:32:24 - _updater             -> Update #991725898 elaboration took 78.125 ms
-[DEBUG   ] - 01:32:32 - complete_dialog_sec  -> Elaborating reply of section uptime
-[DEBUG   ] - 01:32:32 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section uptime with lang IT
-[DEBUG   ] - 01:32:32 - parse                -> Parsing reply string
-[DEBUG   ] - 01:32:32 - execute              -> Sending message
-[WARNING ] - 01:32:33 - _updater             -> Update #991725900 elaboration took 171.875 ms
-[DEBUG   ] - 01:32:42 - add_user             -> Adding user 764850488
-[DEBUG   ] - 01:32:42 - add_user             -> Adding user 764850488
-[DEBUG   ] - 01:32:42 - complete_dialog_sec  -> Elaborating reply of section generic
-[DEBUG   ] - 01:32:42 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section generic with lang IT
-[DEBUG   ] - 01:32:42 - complete_dialog_sec  -> No dialogs set for section generic
-[DEBUG   ] - 01:32:42 - notify               -> Sending a notification message to the bot's owner
-[WARNING ] - 01:32:43 - _updater             -> Update #991725904 elaboration took 187.5 ms
-[DEBUG   ] - 01:33:10 - complete_dialog_sec  -> Elaborating reply of section generic
-[DEBUG   ] - 01:33:10 - get_dialogs_of_section -> Getting dialogs of bot 764850488 from section generic with lang IT
-[DEBUG   ] - 01:33:10 - complete_dialog_sec  -> No dialogs set for section generic
-[DEBUG   ] - 01:33:10 - notify               -> Sending a notification message to the bot's owner
-[WARNING ] - 01:33:10 - _updater             -> Update #991725907 elaboration took 140.625 ms
+[INFO    ] - 22:00:37 - <module>             -> Getting data from configuration file
+[DEBUG   ] - 22:00:37 - <module>             -> Default language: IT
+[INFO    ] - 22:00:37 - run                  -> Starting Kitsu Ultimate
+[DEBUG   ] - 22:00:37 - _load_modules        -> Loading module: modules.meteo.MeteoModule
+[INFO    ] - 22:00:37 - _elab_module_fun     -> Module: loaded 2 custom dummies
+[DEBUG   ] - 22:00:37 - run                  -> Auto attaching bots from mongo
+[DEBUG   ] - 22:00:38 - attach_bots          -> Attaching 2 bots
+[DEBUG   ] - 22:00:38 - attach_bot_by_token  -> Attaching bot 558241218:AAGjc6HbQInm0aPJuqAV5VpRZ5wXax75lJU
+[DEBUG   ] - 22:00:38 - __init__             -> Initializing new bot
+[DEBUG   ] - 22:00:38 - _load_data           -> Getting bot data from mongo
+[DEBUG   ] - 22:00:38 - _get_telegram_data   -> Getting bot data from Telegram
+[DEBUG   ] - 22:00:38 - __init__             -> Bot ready
+[DEBUG   ] - 22:00:38 - attach_bot_by_token  -> Bot 558241218 attached successfully
+[DEBUG   ] - 22:00:38 - attach_bot_by_token  -> Attaching bot 764850488:AAFwWEb3PMQq6emkykMnw7cKgM7fL0YpMOM
+[DEBUG   ] - 22:00:38 - __init__             -> Initializing new bot
+[DEBUG   ] - 22:00:38 - _load_data           -> Getting bot data from mongo
+[DEBUG   ] - 22:00:38 - _get_telegram_data   -> Getting bot data from Telegram
+[DEBUG   ] - 22:00:39 - __init__             -> Bot ready
+[DEBUG   ] - 22:00:39 - attach_bot_by_token  -> Bot 764850488 attached successfully
+[INFO    ] - 22:00:39 - run                  -> Running attached bots
+[INFO    ] - 22:00:39 - _init                -> Bot @SyntaxerControllerBot ok
+[DEBUG   ] - 22:00:39 - run                  -> Starting update loop
+[INFO    ] - 22:00:39 - _init                -> Bot @JavyRobot ok
+[DEBUG   ] - 22:00:39 - run                  -> Starting update loop
+[DEBUG   ] - 22:00:41 - complete_dialog_sec  -> Elaborating reply of section start
+[DEBUG   ] - 22:00:41 - execute              -> Sending message
+[WARNING ] - 22:00:42 - _updater             -> Update #991726489 elaboration took 125.0 ms

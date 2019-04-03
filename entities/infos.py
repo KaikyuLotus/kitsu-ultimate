@@ -104,7 +104,10 @@ class Infos:
              msg_id: int = None,
              force_markdown: bool = False):
 
-        text, quote, markdown, markup = reply_parser.parse(text, self, not parse)
+        text, quote, nolink, markdown, markup = reply_parser.parse(text, self, not parse)
+
+        if not disable_web_page_preview and nolink:
+            disable_web_page_preview = nolink
 
         if not reply_markup and markup:
             reply_markup = markup
