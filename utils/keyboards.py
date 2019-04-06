@@ -1,3 +1,5 @@
+import random
+
 from telegram import methods
 
 
@@ -48,9 +50,11 @@ def menu_options(bot):
     c_symb = bot.custom_command_symb
     btn1 = methods.button(f"Automatic Messages: {symb}", "options_autom")
     btn2 = methods.button(f"Command Symbol: {c_symb}", "options_comm_symbol")
+    btn3 = methods.button("Delete bot", "options_delete_bot")
     back = methods.button("Back", "options_back")
     return methods.inline_keyboard([[btn1],
                                     [btn2],
+                                    [btn3],
                                     [back]])
 
 
@@ -63,6 +67,15 @@ def menu():
     return methods.inline_keyboard([[btn1, btn2, btn3],
                                     [btn4],
                                     [close]])
+
+
+def delete_bot():
+    row1 = [methods.button("Yes", "delete_bot_yes")]
+    row2 = [methods.button("No", "delete_bot_no")]
+    row3 = [methods.button("No", "delete_bot_no")]
+    rows = [row1, row2, row3]
+    random.shuffle(rows)
+    return methods.inline_keyboard(rows)
 
 
 def done():

@@ -1,30 +1,46 @@
 import json
+from json import JSONDecodeError
 
 import requests
+from requests import post
 
 from entities.file import File
 from exceptions.conflict import Conflict
 from exceptions.bad_request import BadRequest
 from exceptions.forbidden import Forbidden
+from exceptions.kitsu_exception import KitsuException
 from exceptions.not_found import NotFound
 from exceptions.telegram_exception import TelegramException
 from exceptions.unauthorized import Unauthorized
+from logger import log
 
 _base_url = "https://api.telegram.org"
 
 
-def execute(token: str, method: str, params: dict = None):
-    res = requests.get(f"{_base_url}/bot{token}/{method}", params=params)
-    status_code, _json = res.status_code, res.json()
+def execute(token: str, method: str, params: dict = None, post_data: dict = None):
+    if post_data is not None:
+        log.d(f"POST request to {_base_url}/bot???/{method}")
+        res = requests.post(f"{_base_url}/bot{token}/{method}", params=params, files=post_data)
+    else:
+        # log.d(f"GET request to {_base_url}/bot???/{method}")
+        res = requests.get(f"{_base_url}/bot{token}/{method}", params=params)
+
+    status_code = res.status_code
 
     if status_code == 200:
-        return _json["result"]
+        return res.json()["result"]
 
     error = f"{status_code} while executing {method}"
-    args = [_json["description"],
-            error,
-            [key for key in params],
-            [params[key] for key in params]]
+    try:
+        args = [res.json()["description"],
+                error,
+                [key for key in params],
+                [params[key] for key in params]]
+    except JSONDecodeError:
+        args = [res.text,
+                error,
+                [key for key in params],
+                [params[key] for key in params]]
 
     if status_code == 409:
         raise Conflict(*args)
@@ -155,17 +171,22 @@ def send_audio(token: str,
 
 def send_voice(token: str,
                chat_id: int,
-               voice: str,
+               voice: str = None,
                disable_notification: bool = None,
                reply_to_message_id: int = None,
-               reply_markup: str = None):
+               reply_markup: str = None,
+               voice_data: bytes = None):
+    if not voice and not voice_data:
+        raise KitsuException("send_voice needs 'voice' or 'voice_data' to be not null")
     return execute(token, "sendVoice", {
         "chat_id": chat_id,
         "voice": voice,
         "disable_notification": disable_notification,
         "reply_to_message_id": reply_to_message_id,
         "reply_markup": reply_markup
-    })
+    }, {
+        "voice": voice_data
+    } if voice_data else None)
 
 
 def send_doc(token: str,

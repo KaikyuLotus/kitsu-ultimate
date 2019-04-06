@@ -6,8 +6,6 @@ from configuration import config_parser
 _default_config_file_name = "resources/config.properties"
 _env_variable = "ENVIRONMENT"  # TODO read from env
 _default_env = "prod"
-_configs = {}
-
 
 class Configuration:
     def __init__(self, file_name):
@@ -37,6 +35,10 @@ class Configuration:
         return [elem.strip() for elem in self._config[key].split(",")]
 
 
+# Declared here to get the type...
+_configs: Dict[str, Configuration] = {}
+
+
 def get_current_env(forced_env: str = None):
     if forced_env:
         return forced_env
@@ -46,7 +48,11 @@ def get_current_env(forced_env: str = None):
 def get_configuration(file_name) -> Configuration:
     if file_name not in _configs:
         _configs[file_name] = Configuration(file_name)
-    return _configs[file_name]
+
+    if _configs[file_name].get_bool("config.live_reload", False):
+        return Configuration(file_name)
+    else:
+        return _configs[file_name]
 
 
 def default():

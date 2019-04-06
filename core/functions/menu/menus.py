@@ -1,12 +1,13 @@
 import re
 from typing import Callable, List, Optional
 
-from core.functions.menu.vars import media_types, trigger_type_list
+from core import lotus_interface
+from core.variables import media_types, trigger_type_list
 from core.lowlevel import mongo_interface
 from entities.dialog import Dialog
 from entities.infos import Infos
 from entities.trigger import Trigger
-from utils import keyboards, regex_utils
+from utils import keyboards, regex_utils, bot_utils
 
 
 # FLOW
@@ -282,7 +283,7 @@ def menu_triggers(infos: Infos) -> Callable:
     return fun
 
 
-def wait_del_dialog_reply(infos: Infos) -> Callable:
+def wait_add_dialog_reply(infos: Infos) -> Callable:
     # Here we can handle both text and callbacks
     if infos.is_callback_query:
         if infos.callback_query.data == "done":
@@ -306,16 +307,25 @@ def wait_del_dialog_reply(infos: Infos) -> Callable:
         reply = infos.message.text
     else:
         infos.reply("Unsupported.")
-        return wait_del_dialog_reply
-
-    probability, reply = regex_utils.get_dialog_probability(reply)
-    if probability is None:
-        probability = 100
+        return wait_add_dialog_reply
 
     section = infos.bot.waiting_data["section"]
 
-    dialog = Dialog(reply, section, infos.db.language, infos.bot.bot_id, 0, probability)
-    mongo_interface.add_dialog(dialog)
+    reg = re.compile(r"!!\s*(\d)\s*(->|=>)\s*(.+)")
+    match = reg.search(reply)
+    if match:
+        if not bot_utils.handle_add_reply_command(infos, match, section):
+            return wait_add_dialog_reply
+    else:
+        probability, reply = regex_utils.get_dialog_probability(reply)
+        if probability is None:
+            probability = 100
+
+        section = infos.bot.waiting_data["section"]
+
+        dialog = Dialog(reply, section, infos.db.language, infos.bot.bot_id, 0, probability)
+        mongo_interface.add_dialog(dialog)
+
     dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section, infos.db.language)
 
     # Final message to append
@@ -332,7 +342,7 @@ def wait_del_dialog_reply(infos: Infos) -> Callable:
                msg_id=infos.bot.waiting_data["msg"].message_id,
                parse=False)
 
-    return wait_del_dialog_reply
+    return wait_add_dialog_reply
 
 
 def add_dialog(infos: Infos) -> Callable:
@@ -362,7 +372,7 @@ def add_dialog(infos: Infos) -> Callable:
                msg_id=infos.bot.waiting_data["msg"].message_id,
                parse=False)
 
-    return wait_del_dialog_reply
+    return wait_add_dialog_reply
 
 
 def wait_del_dialog_number(infos: Infos) -> Callable:
@@ -592,6 +602,40 @@ def menu_wait_command_symbol(infos: Infos):
     return menu_options
 
 
+def menu_delete_bot_phase2(infos: Infos):
+    if not infos.is_callback_query:
+        return menu_delete_bot_phase2
+
+    if infos.callback_query.data == "delete_bot_yes":
+        infos.edit("Deleting bot...\nThis can take some seconds...",
+                   msg_id=infos.bot.waiting_data["msg"].message_id)
+        bot_utils.delete_bot(infos)
+        infos.edit("Bye...",
+                   msg_id=infos.bot.waiting_data["msg"].message_id)
+        lotus_interface.detach_bot(infos.bot)
+
+    if infos.callback_query.data == "delete_bot_no":
+        return to_menu(infos, "I'm sure that you don't want to do it.")
+
+    return menu_delete_bot_phase2
+
+
+def menu_delete_bot(infos: Infos):
+    if not infos.is_callback_query:
+        return menu_delete_bot
+
+    if infos.callback_query.data == "delete_bot_yes":
+        infos.edit("[md]Please be REALLY sure, tap yes again if you are.\n\n*Every bot data will be lost!!*",
+                   msg_id=infos.bot.waiting_data["msg"].message_id,
+                   reply_markup=keyboards.delete_bot())
+        return menu_delete_bot_phase2
+
+    if infos.callback_query.data == "delete_bot_no":
+        return to_menu(infos, "I'm sure that you don't want to do it.")
+
+    return menu_delete_bot
+
+
 def menu_options(infos: Infos):
     if not infos.is_callback_query:
         return menu_options
@@ -609,6 +653,11 @@ def menu_options(infos: Infos):
                    reply_markup=keyboards.cancel(),
                    parse=False)
         return menu_wait_command_symbol
+
+    if infos.callback_query.data == "options_delete_bot":
+        infos.edit("Please be sure before doing this operation...\nTap yes if you're sure",
+                   reply_markup=keyboards.delete_bot())
+        return menu_delete_bot
 
     if infos.callback_query.data == "options_back":
         return to_menu(infos)

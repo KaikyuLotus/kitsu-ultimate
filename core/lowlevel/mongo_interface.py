@@ -117,6 +117,10 @@ def register_bot(token: str, owner_id: int):
     })
 
 
+def delete_bot(token: str):
+    _get_bots_collection().delete_one({"token": token})
+
+
 # endregion
 
 
@@ -230,6 +234,10 @@ def get_dialogs(bot_id: int, language=_default_language) -> List[Dialog]:
     })]
 
 
+def drop_bot_dialogs(bot_id: int):
+    _get_db().dialogs.delete_many({"bot_id": bot_id})
+
+
 # TODO post-debug refactoring
 def add_trigger(trigger: Trigger): _get_db().triggers.insert_one(dict(trigger))
 
@@ -257,6 +265,10 @@ def replace_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
 
 def update_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
     _get_db().triggers.update_one(dict(old_trigger), dict(new_trigger))
+
+
+def drop_bot_triggers(bot_id: int):
+    _get_db().triggers.delete_many({"bot_id": bot_id})
 
 
 def delete_dialog(dialog: Dialog): _get_db().dialogs.delete_one(dict(dialog))

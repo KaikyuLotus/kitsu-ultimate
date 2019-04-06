@@ -1,10 +1,10 @@
-import time
 import importlib
 
 from typing import Type
 
 from configuration import configuration
-from core import manager
+from core import manager, variables
+from core import lotus_interface
 from core.lowlevel import mongo_interface
 from entities.bot import Bot
 from entities.module_function import ModuleFunction
@@ -13,13 +13,10 @@ from exceptions.kitsu_exception import KitsuException
 from exceptions.telegram_exception import TelegramException
 from exceptions.unauthorized import Unauthorized
 from logger import log
-from telegram import methods
 from utils.bot_utils import is_bot_token
-from threading import Thread
 
-_attached_bots = []
+
 _main_bot = None
-_running = False
 
 _config = configuration.default()
 
@@ -35,7 +32,7 @@ def get_maker_bot():
     if _main_bot:
         return _main_bot
 
-    for bot in _attached_bots:
+    for bot in variables.attached_bots:
         if bot.is_maker:
             _main_bot = bot
 
@@ -45,19 +42,7 @@ def get_maker_bot():
     raise KitsuException("Main bot not found!")
 
 
-def _init(bot):
-    if bot.clean_start:
-        methods.clean_updates(bot)
-    log.i(f"Bot @{bot.username} ok")
-
-
-def _run_bot(bot):
-    _init(bot)
-    Thread(target=bot.run, daemon=True).start()
-
-
 def run(threaded: bool = True, idle: bool = True, auto_attach: bool = True):
-    global _running
 
     log.i("Starting Kitsu Ultimate")
 
@@ -92,53 +77,18 @@ def run(threaded: bool = True, idle: bool = True, auto_attach: bool = True):
         attach_bots_from_manager()
 
     log.i("Running attached bots")
-    [_run_bot(bot) for bot in _attached_bots]
+    [lotus_interface.run_bot(bot) for bot in variables.attached_bots]
 
-    _running = True
+    variables.running = True
     if idle:
-        _idle()
-
-
-def _idle():
-    try:
-        while _running:
-            time.sleep(10)
-    except KeyboardInterrupt:
-        log.w("Keyboard interrupt, stopping...")
-        stop()
-
-
-def stop():
-    global _running
-    log.i("Stopping bots")
-    [bot.stop() for bot in _attached_bots]
-    log.i("Stopping mongo ")
-    mongo_interface.stop()
-    _running = False
-
-
-def detach_bot(token: str):
-    log.i(f"Detaching bot {token}")
-    for bot in _attached_bots:
-        if bot.token != token:
-            continue
-        _attached_bots.remove(bot)
-        log.i(f"Bot {token} detached")
-        return bot.stop()
-    log.i(f"Bot {token} not found")
-
-
-def attach_bot(bot):
-    _attached_bots.append(bot)
-    log.i(f"Running bot {bot.bot_id}")
-    _run_bot(bot)
+        lotus_interface.idle()
 
 
 def attach_bot_by_token(token: str):
     try:
         log.d(f"Attaching bot {token}")
         b = Bot(token)
-        _attached_bots.append(b)
+        variables.attached_bots.append(b)
         log.d(f"Bot {b.bot_id} attached successfully")
         return True
     except Unauthorized:
@@ -176,7 +126,7 @@ def attach_bots(tokens: list):
 
 
 def get_attached_bots():
-    return _attached_bots
+    return variables.attached_bots
 
 
 # noinspection PyPep8Naming

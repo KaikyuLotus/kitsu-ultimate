@@ -7,9 +7,10 @@ from typing import List
 import requests
 
 from configuration import configuration
-from core import elaborator, reply_parser
+from core import elaborator, reply_parser, lotus_interface
 from core.lowlevel import mongo_interface
 from entities.infos import Infos
+from exceptions.bad_request import BadRequest
 from exceptions.conflict import Conflict
 from exceptions.unauthorized import Unauthorized
 from logger import log
@@ -128,13 +129,15 @@ class Bot:
             last_update = None
         except Unauthorized:
             log.e(f"Unauthorized bot {self.bot_id}, detaching...")
-            # lotus.detach_bot(self.token)
+            lotus_interface.detach_bot(self.token)
         except Conflict:
             log.e(f"Telegram said that bot {self.bot_id} is already running, detaching...")
-            # lotus.detach_bot(self.token)
+            lotus_interface.detach_bot(self.token)
         except requests.ConnectionError:
             log.e(f"A connection error happened, waiting {_connection_retry_time} seconds before reconnecting")
             time.sleep(_connection_retry_time)
+        except BadRequest as e:
+            log.w(f"Warning, telegram said: {e.message}")
         except Exception as e:
             log.e(str(e))
             traceback.print_tb(e.__traceback__)

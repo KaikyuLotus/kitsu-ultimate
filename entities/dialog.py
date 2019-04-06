@@ -19,9 +19,16 @@ class Dialog:
     def from_json(cls, json):
         if not json:
             return None
+        if "probability" not in json:
+            print(json["reply"],
+                  json["section"],
+                  json["language"],
+                  json["bot_id"],
+                  json["usages"])
+
         return cls(json["reply"],
                    json["section"],
                    json["language"],
                    json["bot_id"],
                    json["usages"],
-                   json["probability"])
+                   json["probability"] if "probability" in json else 100)

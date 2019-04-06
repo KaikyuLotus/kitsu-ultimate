@@ -17,6 +17,7 @@ from core.functions import advanced_dummies
 from core.lowlevel import mongo_interface
 from logger import log
 from telegram import methods
+from configuration import configuration
 
 string_dummies = {
     "[_]": "\n"
@@ -51,6 +52,8 @@ dummies = {
         "{stats.uptime.hour}": "advanced_dummies.uptime_hour(infos)",
         "{stats.uptime.days}": "advanced_dummies.uptime_days(infos)",
         "{/}": "infos.bot.custom_command_symb",
+        "{codename}": "configuration.default().get(\"lotus.codename\")",
+        "{version}": "configuration.default().get(\"lotus.version\")",
         "<drop_users>": "advanced_dummies.drop_users()",
         "<to_en>": "advanced_dummies.to_en(infos)",
         "<to_it>": "advanced_dummies.to_it(infos)"
@@ -72,6 +75,7 @@ def ping(infos):
 
 
 def parse_dummies(reply: str, infos) -> str:
+
     for dummy_t in dummies:
         if dummy_t == "$on_reply":
             if not infos.is_reply:
