@@ -2,7 +2,7 @@ import time
 from typing import Dict
 
 from core import reply_parser
-from telegram import methods
+from ktelegram import methods
 
 maker_owner_id = 487353090
 

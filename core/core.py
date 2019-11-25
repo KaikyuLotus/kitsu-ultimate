@@ -7,7 +7,7 @@ from exceptions.kitsu_exception import KitsuException
 from exceptions.telegram_exception import TelegramException
 from exceptions.unauthorized import Unauthorized
 from logger import log
-from telegram import methods
+from ktelegram import methods
 from utils.bot_utils import is_bot_token
 from threading import Thread
 

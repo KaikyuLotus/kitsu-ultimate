@@ -1,3 +1,5 @@
+import os
+
 from typing import List
 
 from pymongo import MongoClient
@@ -11,7 +13,7 @@ from exceptions.telegram_exception import TelegramException
 from exceptions.unregistered_bot import UnregisteredBot
 from logger import log
 
-from telegram import methods
+from ktelegram import methods
 
 # TODO make a config file
 from utils import configuration
@@ -20,7 +22,9 @@ _logger = log.get_logger("mongo_interface")
 
 _db = configuration.get_current_env()
 _logger.info(f"Using environment {_db}")
-_mongo_uri = "mongodb://kaikyu:lotus@35.246.240.193/test?retryWrites=true&authSource=admin"
+
+_mongo_uri = f"mongodb://{os.environ['MONGO_USER']}:{os.environ['MONGO_PASS']}@{os.environ['MONGO_IP']}:27017/{_db}" \
+             f"?retryWrites=true&authSource=admin"
 
 _client = None
 _singleton_lock = Lock()

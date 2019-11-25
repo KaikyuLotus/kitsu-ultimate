@@ -1,7 +1,7 @@
 import logging
 
 _inited = None
-_level = logging.DEBUG
+_level = logging.INFO
 _file_level = logging.INFO
 _format = '[%(levelname)-8s] - %(asctime)s - %(funcName)-20s -> %(message)s'
 _date_format = "%H:%M:%S"

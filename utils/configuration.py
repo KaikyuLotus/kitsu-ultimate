@@ -1,8 +1,7 @@
 import os
 
-_env_variable = "ENVIRONMENT"  # TODO read from env
-_default_env = "prod"
+_env_variable = "KAI_ENVIRONMENT"
 
 
 def get_current_env():
-    return os.getenv(_env_variable, _default_env)
+    return os.environ["KAI_ENVIRONMENT"]

@@ -1,4 +1,4 @@
-from telegram import methods
+from ktelegram import methods
 
 
 def trigger_type():

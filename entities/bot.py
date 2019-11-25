@@ -1,3 +1,4 @@
+import os
 import time
 import traceback
 
@@ -6,13 +7,13 @@ from core.lowlevel import mongo_interface
 from entities.infos import Infos
 from exceptions.unauthorized import Unauthorized
 from logger import log
-from telegram import methods
+from ktelegram import methods
 
 # TODO make a config file
 from utils import regex_utils
 
-_bot_maker_id = 777706082
-_maker_owner_id = 487353090
+_bot_maker_id = int(os.environ["BOT_MAKER_ID"])
+_maker_owner_id = int(os.environ["MAKER_OWNER_ID"])
 
 _logger = log.get_logger("bot")
 
