@@ -25,7 +25,7 @@ _username = config["mongo"]["username"]
 _ip = config["mongo"]["ip"]
 _db_name = config["mongo"]["db-name"]
 
-_mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=true&authSource=admin"
+_mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=true"
 
 _client = None
 _singleton_lock = Lock()
