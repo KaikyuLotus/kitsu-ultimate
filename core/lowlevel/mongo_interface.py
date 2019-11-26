@@ -24,7 +24,7 @@ _db = configuration.get_current_env()
 _logger.info(f"Using environment {_db}")
 
 _mongo_uri = f"mongodb://{os.environ['MONGO_USER']}:{os.environ['MONGO_PASS']}@{os.environ['MONGO_IP']}:27017/{_db}" \
-             f"?retryWrites=true&authSource=admin"
+             f"?retryWrites=true"
 
 _client = None
 _singleton_lock = Lock()
