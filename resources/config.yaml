@@ -1,0 +1,47 @@
+# This file contains test data
+# Change it based on you environment
+
+lotus:
+  codename: 'BLACK FLOWER'
+  version: '0.8.4-SNAPSHOT'
+
+mongo:
+  username: kaikyu
+  password: password
+  ip: localhost
+  db-name: test
+
+logging:
+  level: DEBUG
+  format: '[%(levelname)-8s] - %(asctime)s - %(funcName)-20s -> %(message)s'
+  date-format: '%H:%M:%S'
+  file-name: resources/log.txt
+
+startup:
+  drop:
+    dialogs: True
+    triggers: True
+    bots: True
+    groups: True
+    users: True
+
+modules:
+  classes:
+    - modules.meteo.MeteoModule
+  meteo:
+    enabled: True
+
+defaults:
+  language: IT
+  maker:
+    token: 777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10
+    id: 777706082
+  owner:
+    id: 487353090
+  retry-time: 5
+  autom:
+    min: 1
+    max: 100
+
+kitsu:
+  backup-password: idk

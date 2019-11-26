@@ -1,28 +1,21 @@
 import logging
 
-from configuration import configuration
+from configuration.config import config
 
-_inited = None
-_config = configuration.default()
-_level = getattr(logging, _config.get("logging.level", "DEBUG"))
-_file_level = getattr(logging, _config.get("logging.file.level", "INFO"))
-_format = _config.get("logging.format", '[%(levelname)-8s] - %(asctime)s - %(funcName)-20s -> %(message)s')
-_date_format = _config.get("logging.date_format", "%H:%M:%S")
-_file_name = _config.get("logging.file.name", "resources/log.txt")
-
-logging.basicConfig(level=_file_level,
-                    format=_format,
-                    datefmt=_date_format,
-                    filename=_file_name,
+logging.basicConfig(level=config["logging"]["level"],
+                    format=config["logging"]["format"],
+                    datefmt=config["logging"]["date-format"],
+                    filename=config["logging"]["file-name"],
                     filemode='w')
 
 _console = logging.StreamHandler()
-_console.setLevel(_level)
-_formatter = logging.Formatter(_format, _date_format)
+_console.setLevel(config["logging"]["level"])
+_formatter = logging.Formatter(config["logging"]["format"],
+                               config["logging"]["date-format"])
 _console.setFormatter(_formatter)
 
 _logger = logging.getLogger("logger")
-_logger.setLevel(_level)
+_logger.setLevel(config["logging"]["level"])
 _logger.addHandler(_console)
 
 i = _logger.info

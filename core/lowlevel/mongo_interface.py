@@ -1,3 +1,4 @@
+import traceback
 from typing import List, Union
 
 from pymongo import MongoClient
@@ -14,26 +15,22 @@ from exceptions.telegram_exception import TelegramException
 from exceptions.unregistered_bot import UnregisteredBot
 from logger import log
 
-from telegram import methods
+from ktelegram import methods
 
-# TODO make a config file
-from configuration import configuration
+from configuration.config import config
 
-# _db = configuration.get_current_env()
-# _logger.info(f"Using environment {_db}")
-log.i("Getting data from configuration file")
-_config = configuration.default()
-_password = _config.get("mongo.password")
-_username = _config.get("mongo.username")
-_ip = _config.get("mongo.ip")
-_db_name = _config.get("mongo.db_name")
+log.i("Getting data from configuration file...")
+_password = config["mongo"]["password"]
+_username = config["mongo"]["username"]
+_ip = config["mongo"]["ip"]
+_db_name = config["mongo"]["db-name"]
 
 _mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=true&authSource=admin"
 
 _client = None
 _singleton_lock = Lock()
 
-_default_language = _config.get("defaults.language", "IT")
+_default_language = config["defaults"]["language"]
 log.d("Default language: " + _default_language)
 
 
@@ -104,17 +101,19 @@ def register_bot(token: str, owner_id: int):
     # Check first if it's a real bot token
     try:
         methods.get_me(token)
-    except TelegramException:
-        return None
-
-    _get_bots_collection().insert_one({
-        "token": token,
-        "owner_id": owner_id,
-        # TODO make a method to change the start mode
-        "clean_start": True,
-        # TODO implement languages
-        "language": "IT"
-    })
+        _get_bots_collection().insert_one({
+            "token": token,
+            "owner_id": owner_id,
+            # TODO make a method to change the start mode
+            "clean_start": True,
+            # TODO implement languages
+            "language": "IT"
+        })
+        log.d(f"Registered new bot with ID {token.split(':')[0]}")
+        return True
+    except TelegramException as ex:
+        log.e(f"Cannot register bot: {ex.message}")
+        return False
 
 
 def delete_bot(token: str):

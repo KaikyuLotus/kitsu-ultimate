@@ -1,7 +1,7 @@
 import re
 
 from entities.infos import Infos
-from configuration import configuration
+from configuration.config import config
 
 gex = re.compile("meteo city: (.+)", re.I)
 
@@ -27,8 +27,7 @@ def meteo_req(infos: Infos):
 
 class MeteoModule:
     def load_dummies(self) -> dict:
-        module_enabled = configuration.default().get_bool("modules.meteo.enabled", True)
-        if not module_enabled:
+        if not config["modules"]["meteo"]["enabled"]:
             return {}
         return {
             "<meteo>": meteo_reg,

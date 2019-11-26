@@ -318,6 +318,7 @@ def wait_add_dialog_reply(infos: Infos) -> Callable:
             return wait_add_dialog_reply
     else:
         probability, reply = regex_utils.get_dialog_probability(reply)
+        reply = reply.replace("\\`", "`")
         if probability is None:
             probability = 100
 
@@ -330,7 +331,6 @@ def wait_add_dialog_reply(infos: Infos) -> Callable:
 
     # Final message to append
     f_msg = "Please send the replies you want!"
-
     if not dialogs:
         msg = f"[md]No dialogs for section `{section}`\n{f_msg}"
     else:

@@ -2,16 +2,15 @@ import re
 import time
 from typing import Dict, Optional
 
-from configuration import configuration
+from configuration.config import config
 from core import reply_parser
 from ktelegram import methods
 from core.lowlevel import mongo_interface
 from entities import user, group
 from exceptions.bad_request import BadRequest
 
-_config = configuration.default()
-_maker_owner_id = _config.get_int("defaults.owner_id")
-_default_language = _config.get("defaults.language", "IT")
+_maker_owner_id = config["defaults"]["owner"]["id"]
+_default_language = config["defaults"]["language"]
 
 
 class Infos:

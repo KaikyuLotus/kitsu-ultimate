@@ -1,0 +1,166 @@
+[INFO    ] - 23:39:49 - <module>             -> Getting data from configuration file...
+[DEBUG   ] - 23:39:49 - <module>             -> Default language: IT
+[INFO    ] - 23:39:49 - run                  -> Starting Kitsu Ultimate
+[DEBUG   ] - 23:39:49 - _load_modules        -> Loading module: modules.meteo with class <class 'modules.meteo.MeteoModule'>
+[INFO    ] - 23:39:49 - _elab_module_fun     -> Module: loaded 2 custom dummies
+[INFO    ] - 23:39:49 - run                  -> Dropping dialogs
+[INFO    ] - 23:39:49 - run                  -> Dropping triggers
+[INFO    ] - 23:39:49 - run                  -> Dropping bots
+[INFO    ] - 23:39:49 - run                  -> Dropping groups
+[INFO    ] - 23:39:49 - run                  -> Dropping users
+[DEBUG   ] - 23:39:49 - run                  -> Auto attaching bots from mongo
+[INFO    ] - 23:39:49 - attach_bots_from_manager -> Not bots found on database, adding default bot
+[DEBUG   ] - 23:39:49 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:49 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getMe HTTP/1.1" 200 104
+[DEBUG   ] - 23:39:49 - register_bot         -> Registered new bot with ID 777706082
+[DEBUG   ] - 23:39:49 - attach_bots          -> Attaching 1 bots
+[DEBUG   ] - 23:39:49 - attach_bot_by_token  -> Attaching bot 777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10
+[DEBUG   ] - 23:39:49 - __init__             -> Initializing new bot
+[DEBUG   ] - 23:39:49 - _load_data           -> Getting bot data from mongo
+[DEBUG   ] - 23:39:49 - _get_telegram_data   -> Getting bot data from Telegram
+[DEBUG   ] - 23:39:49 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:49 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getMe HTTP/1.1" 200 104
+[DEBUG   ] - 23:39:49 - __init__             -> Bot ready
+[DEBUG   ] - 23:39:49 - attach_bot_by_token  -> Bot 777706082 attached successfully
+[INFO    ] - 23:39:49 - run                  -> Running attached bots
+[DEBUG   ] - 23:39:49 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:50 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=-1&timeout=0 HTTP/1.1" 200 23
+[INFO    ] - 23:39:50 - _init                -> Bot @GoChanDevBot ok
+[DEBUG   ] - 23:39:50 - run                  -> Starting update loop
+[DEBUG   ] - 23:39:50 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:54 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=0&timeout=120 HTTP/1.1" 200 402
+[DEBUG   ] - 23:39:54 - add_user             -> Adding user 487353090
+[DEBUG   ] - 23:39:54 - owner_command        -> Owner issued command menu
+[DEBUG   ] - 23:39:54 - cancel_wait          -> Waiting cancelled
+[DEBUG   ] - 23:39:54 - execute              -> Sending message
+[DEBUG   ] - 23:39:54 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:54 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/sendMessage?text=Welcome+Kaikyu%2C+what+do+you+need%3F&chat_id=487353090&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Dialogs%22%2C+%22callback_data%22%3A+%22menu_dialogs%22%7D%2C+%7B%22text%22%3A+%22Triggers%22%2C+%22callback_data%22%3A+%22menu_triggers%22%7D%2C+%7B%22text%22%3A+%22Sections%22%2C+%22callback_data%22%3A+%22menu_sections%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Options%22%2C+%22callback_data%22%3A+%22menu_options%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Close%22%2C+%22callback_data%22%3A+%22menu_close%22%7D%5D%5D%7D&disable_web_page_preview=False HTTP/1.1" 200 592
+[DEBUG   ] - 23:39:54 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:55 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303926&timeout=120 HTTP/1.1" 200 864
+[DEBUG   ] - 23:39:55 - _update_elaborator   -> Calling callback menu_choice
+[DEBUG   ] - 23:39:55 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:56 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+choose+an+option&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Add+Trigger%22%2C+%22callback_data%22%3A+%22add_trigger%22%7D%2C+%7B%22text%22%3A+%22Del.+Trigger%22%2C+%22callback_data%22%3A+%22del_trigger%22%7D%5D%2C+%5B%7B%22text%22%3A+%22List+Triggers%22%2C+%22callback_data%22%3A+%22list_triggers%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Back%22%2C+%22callback_data%22%3A+%22menu_back%22%7D%5D%5D%7D HTTP/1.1" 200 563
+[DEBUG   ] - 23:39:56 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:56 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303927&timeout=120 HTTP/1.1" 200 833
+[DEBUG   ] - 23:39:56 - _update_elaborator   -> Calling callback menu_triggers
+[DEBUG   ] - 23:39:56 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:57 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+now+send+the+dialog+section&chat_id=487353090&message_id=785 HTTP/1.1" 200 323
+[DEBUG   ] - 23:39:57 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:59 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303928&timeout=120 HTTP/1.1" 200 346
+[DEBUG   ] - 23:39:59 - _update_elaborator   -> Calling callback add_trigger
+[DEBUG   ] - 23:39:59 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:39:59 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+now+select+the+trigger+type&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Interaction%22%2C+%22callback_data%22%3A+%22interaction%22%7D%2C+%7B%22text%22%3A+%22Content%22%2C+%22callback_data%22%3A+%22content%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Equal%22%2C+%22callback_data%22%3A+%22equal%22%7D%2C+%7B%22text%22%3A+%22Eteraction%22%2C+%22callback_data%22%3A+%22eteraction%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Command%22%2C+%22callback_data%22%3A+%22command%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Cancel%22%2C+%22callback_data%22%3A+%22cancel%22%7D%5D%5D%7D HTTP/1.1" 200 646
+[DEBUG   ] - 23:39:59 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:01 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303929&timeout=120 HTTP/1.1" 200 912
+[DEBUG   ] - 23:40:01 - _update_elaborator   -> Calling callback wait_trigger_type_add_reply
+[DEBUG   ] - 23:40:01 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:01 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Trigger+of+type+%60command%60+in+section+%60version%60%3A%0A%0ANow+send+the+triggers+as+replies.&chat_id=487353090&message_id=785&parse_mode=markdown&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Done%22%2C+%22callback_data%22%3A+%22done%22%7D%5D%5D%7D HTTP/1.1" 200 538
+[DEBUG   ] - 23:40:01 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:03 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303930&timeout=120 HTTP/1.1" 200 346
+[DEBUG   ] - 23:40:03 - _update_elaborator   -> Calling callback read_trigger
+[DEBUG   ] - 23:40:03 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:04 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Triggers+of+type+%60command%60+in+section+%60version%60%3A%0A1%5D+%60version%60+-%3E+%60version%60+%280+usages%29%0A%0ANow+send+the+triggers+as+replies.&chat_id=487353090&message_id=785&parse_mode=markdown&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Done%22%2C+%22callback_data%22%3A+%22done%22%7D%5D%5D%7D HTTP/1.1" 200 651
+[DEBUG   ] - 23:40:04 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:04 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303931&timeout=120 HTTP/1.1" 200 651
+[DEBUG   ] - 23:40:04 - add_group            -> Adding group -1001452586260
+[DEBUG   ] - 23:40:04 - add_user             -> Adding user 106541117
+[DEBUG   ] - 23:40:04 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:05 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303932&timeout=120 HTTP/1.1" 200 347
+[DEBUG   ] - 23:40:05 - _update_elaborator   -> Calling callback read_trigger
+[DEBUG   ] - 23:40:05 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:06 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Triggers+of+type+%60command%60+in+section+%60version%60%3A%0A1%5D+%60version%60+-%3E+%60version%60+%280+usages%29%0A2%5D+%60codename%60+-%3E+%60version%60+%280+usages%29%0A%0ANow+send+the+triggers+as+replies.&chat_id=487353090&message_id=785&parse_mode=markdown&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Done%22%2C+%22callback_data%22%3A+%22done%22%7D%5D%5D%7D HTTP/1.1" 200 764
+[DEBUG   ] - 23:40:06 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:07 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303933&timeout=120 HTTP/1.1" 200 1027
+[DEBUG   ] - 23:40:07 - _update_elaborator   -> Calling callback read_trigger
+[DEBUG   ] - 23:40:07 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:07 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Do+you+need+something+else&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Dialogs%22%2C+%22callback_data%22%3A+%22menu_dialogs%22%7D%2C+%7B%22text%22%3A+%22Triggers%22%2C+%22callback_data%22%3A+%22menu_triggers%22%7D%2C+%7B%22text%22%3A+%22Sections%22%2C+%22callback_data%22%3A+%22menu_sections%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Options%22%2C+%22callback_data%22%3A+%22menu_options%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Close%22%2C+%22callback_data%22%3A+%22menu_close%22%7D%5D%5D%7D HTTP/1.1" 200 608
+[DEBUG   ] - 23:40:07 - cancel_wait          -> Waiting cancelled
+[DEBUG   ] - 23:40:07 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:08 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303934&timeout=120 HTTP/1.1" 200 304
+[DEBUG   ] - 23:40:08 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:08 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303935&timeout=120 HTTP/1.1" 200 879
+[DEBUG   ] - 23:40:08 - _update_elaborator   -> Calling callback menu_choice
+[DEBUG   ] - 23:40:08 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:08 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+choose+an+option&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Add+Dialog%22%2C+%22callback_data%22%3A+%22add_dialog%22%7D%2C+%7B%22text%22%3A+%22Del.+Dialog%22%2C+%22callback_data%22%3A+%22del_dialog%22%7D%5D%2C+%5B%7B%22text%22%3A+%22List+Dialogs%22%2C+%22callback_data%22%3A+%22list_dialogs%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Back%22%2C+%22callback_data%22%3A+%22menu_back%22%7D%5D%5D%7D HTTP/1.1" 200 557
+[DEBUG   ] - 23:40:08 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:09 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303936&timeout=120 HTTP/1.1" 200 826
+[DEBUG   ] - 23:40:09 - _update_elaborator   -> Calling callback menu_dialogs
+[DEBUG   ] - 23:40:09 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:09 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+now+send+the+dialog+section&chat_id=487353090&message_id=785 HTTP/1.1" 200 323
+[DEBUG   ] - 23:40:09 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:10 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303937&timeout=120 HTTP/1.1" 200 346
+[DEBUG   ] - 23:40:10 - _update_elaborator   -> Calling callback add_dialog
+[DEBUG   ] - 23:40:10 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:11 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=No+dialogs+for+section+%60version%60%0APlease+send+the+replies+you+want%21&chat_id=487353090&message_id=785&parse_mode=markdown&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Done%22%2C+%22callback_data%22%3A+%22done%22%7D%5D%5D%7D HTTP/1.1" 200 484
+[DEBUG   ] - 23:40:11 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:11 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303938&timeout=120 HTTP/1.1" 200 747
+[DEBUG   ] - 23:40:11 - _update_elaborator   -> Calling callback wait_add_dialog_reply
+[DEBUG   ] - 23:40:11 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:12 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Do+you+need+something+else&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Dialogs%22%2C+%22callback_data%22%3A+%22menu_dialogs%22%7D%2C+%7B%22text%22%3A+%22Triggers%22%2C+%22callback_data%22%3A+%22menu_triggers%22%7D%2C+%7B%22text%22%3A+%22Sections%22%2C+%22callback_data%22%3A+%22menu_sections%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Options%22%2C+%22callback_data%22%3A+%22menu_options%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Close%22%2C+%22callback_data%22%3A+%22menu_close%22%7D%5D%5D%7D HTTP/1.1" 200 608
+[DEBUG   ] - 23:40:12 - cancel_wait          -> Waiting cancelled
+[DEBUG   ] - 23:40:12 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:13 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303939&timeout=120 HTTP/1.1" 200 879
+[DEBUG   ] - 23:40:13 - _update_elaborator   -> Calling callback menu_choice
+[DEBUG   ] - 23:40:13 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:13 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+choose+an+option&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Add+Dialog%22%2C+%22callback_data%22%3A+%22add_dialog%22%7D%2C+%7B%22text%22%3A+%22Del.+Dialog%22%2C+%22callback_data%22%3A+%22del_dialog%22%7D%5D%2C+%5B%7B%22text%22%3A+%22List+Dialogs%22%2C+%22callback_data%22%3A+%22list_dialogs%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Back%22%2C+%22callback_data%22%3A+%22menu_back%22%7D%5D%5D%7D HTTP/1.1" 200 557
+[DEBUG   ] - 23:40:13 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:13 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303940&timeout=120 HTTP/1.1" 200 826
+[DEBUG   ] - 23:40:13 - _update_elaborator   -> Calling callback menu_dialogs
+[DEBUG   ] - 23:40:13 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:14 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Please+now+send+the+dialog+section&chat_id=487353090&message_id=785 HTTP/1.1" 200 323
+[DEBUG   ] - 23:40:14 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:15 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303941&timeout=120 HTTP/1.1" 200 346
+[DEBUG   ] - 23:40:15 - _update_elaborator   -> Calling callback add_dialog
+[DEBUG   ] - 23:40:15 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:16 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=No+dialogs+for+section+%60version%60%0APlease+send+the+replies+you+want%21&chat_id=487353090&message_id=785&parse_mode=markdown&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Done%22%2C+%22callback_data%22%3A+%22done%22%7D%5D%5D%7D HTTP/1.1" 200 484
+[DEBUG   ] - 23:40:16 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:54 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303942&timeout=120 HTTP/1.1" 200 401
+[DEBUG   ] - 23:40:54 - _update_elaborator   -> Calling callback wait_add_dialog_reply
+[DEBUG   ] - 23:40:54 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:54 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Dialogs+for+section+%60version%60%3A%0A1%5D+%60%5Bmd%5DCurrent+version+%60%7Bversion%7D%60%0ACodename+%60%7Bcodename%7D%60%60+%5B100%25%5D+%280+usages%29%0A%0APlease+send+the+replies+you+want%21&chat_id=487353090&message_id=785&parse_mode=markdown&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Done%22%2C+%22callback_data%22%3A+%22done%22%7D%5D%5D%7D HTTP/1.1" 200 635
+[DEBUG   ] - 23:40:54 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:55 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303943&timeout=120 HTTP/1.1" 200 898
+[DEBUG   ] - 23:40:55 - _update_elaborator   -> Calling callback wait_add_dialog_reply
+[DEBUG   ] - 23:40:55 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:56 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/editMessageText?text=Do+you+need+something+else&chat_id=487353090&message_id=785&reply_markup=%7B%22inline_keyboard%22%3A+%5B%5B%7B%22text%22%3A+%22Dialogs%22%2C+%22callback_data%22%3A+%22menu_dialogs%22%7D%2C+%7B%22text%22%3A+%22Triggers%22%2C+%22callback_data%22%3A+%22menu_triggers%22%7D%2C+%7B%22text%22%3A+%22Sections%22%2C+%22callback_data%22%3A+%22menu_sections%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Options%22%2C+%22callback_data%22%3A+%22menu_options%22%7D%5D%2C+%5B%7B%22text%22%3A+%22Close%22%2C+%22callback_data%22%3A+%22menu_close%22%7D%5D%5D%7D HTTP/1.1" 200 608
+[DEBUG   ] - 23:40:56 - cancel_wait          -> Waiting cancelled
+[DEBUG   ] - 23:40:56 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:59 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303944&timeout=120 HTTP/1.1" 200 877
+[DEBUG   ] - 23:40:59 - _update_elaborator   -> Calling callback menu_choice
+[DEBUG   ] - 23:40:59 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:40:59 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/deleteMessage?message_id=785&chat_id=487353090 HTTP/1.1" 200 25
+[DEBUG   ] - 23:40:59 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:03 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303945&timeout=120 HTTP/1.1" 200 405
+[DEBUG   ] - 23:41:03 - complete_dialog_sec  -> Elaborating reply of section version
+[DEBUG   ] - 23:41:03 - execute              -> Sending message
+[DEBUG   ] - 23:41:03 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:04 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/sendMessage?text=Current+version+%600.8.4-SNAPSHOT%60%0ACodename+%60BLACK+FLOWER%60&chat_id=487353090&parse_mode=markdown&disable_web_page_preview=False HTTP/1.1" 200 412
+[DEBUG   ] - 23:41:04 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:13 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303946&timeout=120 HTTP/1.1" 200 940
+[DEBUG   ] - 23:41:14 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:19 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303947&timeout=120 HTTP/1.1" 200 328
+[DEBUG   ] - 23:41:19 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:21 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303948&timeout=120 HTTP/1.1" 200 377
+[DEBUG   ] - 23:41:21 - complete_dialog_sec  -> Elaborating reply of section version
+[DEBUG   ] - 23:41:21 - execute              -> Sending message
+[DEBUG   ] - 23:41:21 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:22 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/sendMessage?text=Current+version+%600.8.4-SNAPSHOT%60%0ACodename+%60BLACK+FLOWER%60&chat_id=-1001452586260&parse_mode=markdown&disable_web_page_preview=False HTTP/1.1" 200 384
+[DEBUG   ] - 23:41:22 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:24 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303949&timeout=120 HTTP/1.1" 200 378
+[DEBUG   ] - 23:41:24 - complete_dialog_sec  -> Elaborating reply of section version
+[DEBUG   ] - 23:41:24 - execute              -> Sending message
+[DEBUG   ] - 23:41:24 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:24 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/sendMessage?text=Current+version+%600.8.4-SNAPSHOT%60%0ACodename+%60BLACK+FLOWER%60&chat_id=-1001452586260&parse_mode=markdown&disable_web_page_preview=False HTTP/1.1" 200 384
+[DEBUG   ] - 23:41:24 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:26 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303950&timeout=120 HTTP/1.1" 200 315
+[DEBUG   ] - 23:41:26 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:41 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303951&timeout=120 HTTP/1.1" 200 664
+[DEBUG   ] - 23:41:41 - add_user             -> Adding user 777706082
+[DEBUG   ] - 23:41:41 - complete_dialog_sec  -> Elaborating reply of section generic
+[DEBUG   ] - 23:41:41 - complete_dialog_sec  -> No dialogs set for section generic lang IT
+[DEBUG   ] - 23:41:41 - notify               -> Sending a notification message to the bot's owner
+[DEBUG   ] - 23:41:41 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:42 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/sendMessage?text=No+dialogs+set+for+section+generic+lang+IT&chat_id=487353090 HTTP/1.1" 200 308
+[DEBUG   ] - 23:41:42 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org
+[DEBUG   ] - 23:41:44 - _make_request        -> https://api.telegram.org:443 "GET /bot777706082:AAGp1GeN56o6lVc6ahnMt9AbZSn9Cqxql10/getUpdates?offset=118303952&timeout=120 HTTP/1.1" 200 569
+[DEBUG   ] - 23:41:44 - _new_conn            -> Starting new HTTPS connection (1): api.telegram.org

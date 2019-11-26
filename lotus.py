@@ -1,8 +1,9 @@
 import importlib
+import traceback
 
 from typing import Type
 
-from configuration import configuration
+from configuration.config import config
 from core import manager, variables
 from core import lotus_interface
 from core.lowlevel import mongo_interface
@@ -17,9 +18,6 @@ from utils.bot_utils import is_bot_token
 
 
 _main_bot = None
-
-_config = configuration.default()
-
 
 _overrideable_module_function = [
     ModuleFunction("load_dummies", dict, True)
@@ -48,23 +46,23 @@ def run(threaded: bool = True, idle: bool = True, auto_attach: bool = True):
 
     _load_modules()
 
-    if _config.get_bool("startup.drop.dialogs"):
+    if config["startup"]["drop"]["dialogs"]:
         log.i("Dropping dialogs")
         mongo_interface.drop_dialogs()
 
-    if _config.get_bool("startup.drop.triggers"):
+    if config["startup"]["drop"]["triggers"]:
         log.i("Dropping triggers")
         mongo_interface.drop_triggers()
 
-    if _config.get_bool("startup.drop.bots"):
+    if config["startup"]["drop"]["bots"]:
         log.i("Dropping bots")
         mongo_interface.drop_bots()
 
-    if _config.get_bool("startup.drop.groups"):
+    if config["startup"]["drop"]["groups"]:
         log.i("Dropping groups")
         mongo_interface.drop_groups()
 
-    if _config.get_bool("startup.drop.users"):
+    if config["startup"]["drop"]["users"]:
         log.i("Dropping users")
         mongo_interface.drop_users()
 
@@ -104,11 +102,13 @@ def attach_bots_from_manager():
     tokens = manager.get_tokens()
     if not tokens:
         log.i("Not bots found on database, adding default bot")
-        maker_token = _config.get("defaults.maker_token")
-        owner_id = _config.get("defaults.owner_id")
+        maker_token = config["defaults"]["maker"]["token"]
+        owner_id = config["defaults"]["owner"]["id"]
         if not maker_token or not owner_id:
             raise ConfigurationError("No bots on database and configuration file has no default token nor owner id")
-        mongo_interface.register_bot(maker_token, owner_id)
+        if not mongo_interface.register_bot(maker_token, owner_id):
+            log.e("Could not even register default bot, interrupting execution abruptly")
+            exit(1)
     attach_bots(manager.get_tokens())
 
 
@@ -131,16 +131,17 @@ def get_attached_bots():
 
 # noinspection PyPep8Naming
 def _load_modules():
-    for module in _config.get_list("modules.class_list", []):
+    for module in config["modules"]["classes"]:
         try:
-            log.d(f"Loading module: {module}")
             if "." in module:
                 class_name = module.split(".")[-1]
                 module = ".".join(module.split(".")[:-1])
                 LoadedModule = getattr(importlib.import_module(module), class_name)
+                log.d(f"Loading module: {module} with class {LoadedModule}")
                 load_module(LoadedModule)
         except Exception as err:
             log.e(err)
+            traceback.print_exc()
 
 
 def load_module(Module: Type):

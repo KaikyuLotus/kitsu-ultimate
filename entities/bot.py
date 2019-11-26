@@ -7,7 +7,7 @@ from typing import List
 
 import requests
 
-from configuration import configuration
+from configuration.config import config
 from core import elaborator, reply_parser, lotus_interface
 from core.lowlevel import mongo_interface
 from entities.infos import Infos
@@ -16,14 +16,11 @@ from exceptions.conflict import Conflict
 from exceptions.unauthorized import Unauthorized
 from logger import log
 from ktelegram import methods
-
-# TODO make a config file
 from utils import regex_utils
 
-_config = configuration.default()
-_bot_maker_id = _config.get_int("defaults.maker_id")
-_maker_owner_id = _config.get_int("defaults.owner_id")
-_connection_retry_time = _config.get_int("connection.retry_time", 5)
+_bot_maker_id = config["defaults"]["maker"]["id"]
+_maker_owner_id = config["defaults"]["owner"]["id"]
+_connection_retry_time = config["defaults"]["retry-time"]
 
 
 class Bot:

@@ -4,7 +4,7 @@ from threading import Thread
 from core import variables
 from core.lowlevel import mongo_interface
 from logger import log
-from telegram import methods
+from ktelegram import methods
 
 
 def detach_bot(token: str):

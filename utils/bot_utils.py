@@ -3,7 +3,7 @@ from typing import Optional
 
 from core.lowlevel import mongo_interface
 from entities.dialog import Dialog
-from telegram import methods
+from ktelegram import methods
 
 _token_length = 45
 

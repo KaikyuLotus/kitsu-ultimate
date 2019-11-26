@@ -34,8 +34,8 @@ def execute(token: str, method: str, params: dict = None, post_data: dict = None
     try:
         args = [res.json()["description"],
                 error,
-                [key for key in params],
-                [params[key] for key in params]]
+                [key for key in (params if params else [])],
+                [params[key] for key in (params if params else [])]]
     except JSONDecodeError:
         args = [res.text,
                 error,

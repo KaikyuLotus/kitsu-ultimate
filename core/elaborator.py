@@ -2,7 +2,7 @@ import base64
 import json
 from typing import List
 
-from configuration import configuration
+from configuration.config import config
 from core.functions import maker_functions, functions
 from core.lowlevel import mongo_interface
 from core.functions.maker_master_functions import stop
@@ -14,13 +14,11 @@ from entities.trigger import Trigger
 from logger import log
 from utils import regex_utils
 
-_config = configuration.default()
-_autom_min = _config.get_int("autom.min", 1)
-_autom_max = _config.get_int("autom.max", 100)
-_backup_password = _config.get("backup.password", "")
+_autom_min = config["defaults"]["autom"]["min"]
+_autom_max = config["defaults"]["autom"]["max"]
+_backup_password = config["kitsu"]["backup-password"]
 
-_commands = {
-}
+_commands = {}
 
 _owner_commands = {
     "menu": functions.menu,
