@@ -1,10 +1,17 @@
 import re
+from typing import Optional
+
+from logger import log
 
 
 def string_to_regex(string: str):
     for char in "aeiou":
         string = string.replace(char, char + "+")
     return string
+
+
+def is_command(string: str, symbol: str, command: str):
+    return True if re.search(rf"{re.escape(symbol)}{re.escape(command)}( .+)?", string, flags=re.I) else False
 
 
 # Better return a boolean than a match object
@@ -14,17 +21,30 @@ def is_interaction(string: str, bot_name: str):
 
 
 def is_equal(string: str, trigger: str):
-    return True if re.search(rf"^{string_to_regex(trigger)}$", string,
+    return True if re.search(rf"^{trigger}$", string,
                              flags=re.I) else False
 
 
 def is_content(string: str, trigger: str):
-    r_trigger = string_to_regex(trigger)
-    if re.search(rf"\b{r_trigger}\b", string, flags=re.I):
-        return False if re.search(rf"^{r_trigger}$", string,
+    if re.search(rf"\b{trigger}\b", string, flags=re.I):
+        return False if re.search(rf"^{trigger}$", string,
                                   flags=re.I) else True
 
 
 def is_in_message(message: str, trigger: str):
-    return True if re.search(rf"\b{string_to_regex(trigger)}\b", message,
+    return True if re.search(rf"\b{trigger}\b", message,
                              flags=re.I) else False
+
+
+def get_dialog_probability(message: str) -> [Optional[int], str]:
+    match = re.search(r"^{(\d{1,3})%}", message)
+    prob: Optional[int] = None
+    if match:
+        prob = int(match.group(1))
+        if prob < 1:
+            prob = 1
+        elif prob > 99:
+            prob = 100
+        message = message.replace(match.group(0), "")
+        log.d(f"Found probability in string: {prob}")
+    return prob, message

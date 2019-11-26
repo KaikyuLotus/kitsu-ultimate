@@ -1,4 +1,0 @@
-[INFO    ] - 14:04:12 - <module>             -> Using environment test
-[INFO    ] - 14:04:12 - <module>             -> Starting Kitsu Ultimate
-[INFO    ] - 14:04:17 - run                  -> Running attached bots
-[INFO    ] - 14:04:17 - _init                -> Bot @KaikyuBot ok

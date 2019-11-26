@@ -1,7 +1,7 @@
-from core import core
+# import lotus
 from entities.infos import Infos
 
 
 def stop(infos: Infos):
-    core.stop()
+    # lotus.stop()
     infos.reply("Stopped...")
