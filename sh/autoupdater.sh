@@ -32,6 +32,9 @@ do
     echo "Pulling changes"
     git pull origin master
 
+    echo "Updating dependencies"
+    $PIPVER -q install -r requirements.txt
+
     echo "Starting lotus.py"
     nohup $PYVER lotus.py &
 
