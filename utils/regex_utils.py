@@ -7,6 +7,19 @@ _multi_frag = "\\b[\\w\\s]*\\b"
 _multi_frag_symbol = "\\&"
 
 
+def bound_st(s: str):
+    return r"\b" if s[0].isalpha() else "\\B"
+
+
+def bound_nd(s: str):
+    """
+    NB this is not really stable as it does not consider regex chars that are not actual alphas
+    :param s:
+    :return:
+    """
+    return r"\b" if s[-1].isalpha() or s[-1] == "+" else "\\B"
+
+
 def string_to_regex(string: str):
     for char in "aeiou":
         string = string.replace(char, char + "+")
@@ -36,7 +49,7 @@ def is_content(string: str, trigger: str):
 
 
 def is_in_message(message: str, trigger: str):
-    return True if re.search(rf"\b{trigger.replace(_multi_frag_symbol, _multi_frag)}\b", message, flags=re.I) else False
+    return True if re.search(rf"{bound_st(trigger)}{trigger.replace(_multi_frag_symbol, _multi_frag)}{bound_nd(trigger)}", message, flags=re.I) else False
 
 
 def get_dialog_probability(message: str) -> [Optional[int], str]:
