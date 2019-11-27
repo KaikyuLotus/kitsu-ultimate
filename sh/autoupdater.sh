@@ -13,6 +13,10 @@ echo "Tools ok!"
 # Prepare...
 pkill python || echo "Python was not running."
 git pull
+
+# First boot up
+echo "Starting lotus.py"
+nohup $PYVER lotus.py &
 echo "All ok!"
 echo "Starting loop..."
 
