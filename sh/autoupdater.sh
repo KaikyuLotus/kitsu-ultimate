@@ -1,13 +1,16 @@
 echo Starting auto updater script
 
+PYVER=python3.7
+PIPVER=pip3
+
 # Some preconditions first
 set -e
-python --version
-pip3 install -r requirements.txt
+$PYVER --version
+$PIPVER install -r requirements.txt
 echo Tools ok!
 
 # Prepare...
-pkill python
+pkill $PYVER
 git pull
 echo All ok!
 echo Starting loop...
@@ -30,7 +33,7 @@ do
     git pull origin master;
 
     echo Starting lotus.py
-    nohup python3.7 lotus.py &
+    nohup $PYVER lotus.py &
 
   fi
   sleep 5
