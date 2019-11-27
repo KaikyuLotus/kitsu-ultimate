@@ -1,3 +1,17 @@
+echo Starting auto updater script
+
+# Some preconditions first
+set -e
+python --version
+pip3 install -r requirements.txt
+echo Tools ok!
+
+# Prepare...
+pkill python
+git pull
+echo All ok!
+echo Starting loop...
+
 while true
 do
   git fetch;
