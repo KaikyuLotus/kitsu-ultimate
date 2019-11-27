@@ -42,7 +42,7 @@ def get_maker_bot():
 
 def run(threaded: bool = True, idle: bool = True, auto_attach: bool = True):
 
-    log.i("Starting Kitsu Ultimate")
+    log.i(f"Starting Kitsu Ultimate version {config['lotus']['version']}")
 
     _load_modules()
 

@@ -148,6 +148,7 @@ class Bot:
         self.running = True
         self.start_time = time.time()
         log.d("Starting update loop")
+        methods.send_message(self.token, self.owner_id, "Master, i just booted up!")
         while self.running:
             self._updater()
 
