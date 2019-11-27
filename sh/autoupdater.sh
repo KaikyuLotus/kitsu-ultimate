@@ -20,5 +20,4 @@ do
 
   fi
   sleep 5
-  echo Checking again
 done

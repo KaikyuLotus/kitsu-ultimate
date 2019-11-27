@@ -50,4 +50,4 @@ def stop():
 def attach_bot(bot):
     variables.attached_bots.append(bot)
     log.i(f"Running bot {bot.bot_id}")
-    _run_bot(bot)
+    run_bot(bot)
