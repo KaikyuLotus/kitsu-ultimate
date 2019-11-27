@@ -10,7 +10,7 @@ $PIPVER install -r requirements.txt
 echo "Tools ok!"
 
 # Prepare...
-pkill python
+pkill python || echo "Python was not running."
 git pull
 echo "All ok!"
 echo "Starting loop..."
@@ -26,7 +26,7 @@ do
     echo "An update has been noticed"
 
     echo "Killing Python"
-    pkill python # Maybe we should kill only lotus.py...
+    pkill python  || echo "Python was not running." # Maybe we should kill only lotus.py...
 
     # pull and merge changes
     echo "Pulling changes"
