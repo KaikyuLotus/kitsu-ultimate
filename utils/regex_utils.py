@@ -3,6 +3,9 @@ from typing import Optional
 
 from logger import log
 
+_multi_frag = "\\b[\\w\\s]*\\b"
+_multi_frag_symbol = "\\&"
+
 
 def string_to_regex(string: str):
     for char in "aeiou":
@@ -26,14 +29,14 @@ def is_equal(string: str, trigger: str):
 
 
 def is_content(string: str, trigger: str):
-    if re.search(rf"\b{trigger}\b", string, flags=re.I):
-        return False if re.search(rf"^{trigger}$", string,
-                                  flags=re.I) else True
+    if _multi_frag_symbol not in trigger and re.search(rf"^{trigger}$", string, flags=re.I):
+        return False  # This is an equal so not valid
+
+    return is_in_message(string, trigger)
 
 
 def is_in_message(message: str, trigger: str):
-    return True if re.search(rf"\b{trigger}\b", message,
-                             flags=re.I) else False
+    return True if re.search(rf"\b{trigger.replace(_multi_frag_symbol, _multi_frag)}\b", message, flags=re.I) else False
 
 
 def get_dialog_probability(message: str) -> [Optional[int], str]:

@@ -5,23 +5,22 @@ import re
 
 from inspect import signature
 from random import choice
+from core.lowlevel import mongo_interface
+from logger import log
+from ktelegram import methods
 
 # Eval imports
 # noinspection PyUnresolvedReferences
 from typing import List, Optional, Dict
-
+# noinspection PyUnresolvedReferences
 from core import manager
 # noinspection PyUnresolvedReferences
 from core.functions import advanced_dummies
-
-from core.lowlevel import mongo_interface
-from logger import log
-from ktelegram import methods
+# noinspection PyUnresolvedReferences
 from configuration.config import config
 
-string_dummies = {
-    "[_]": "\n"
-}
+
+string_dummies = {}
 
 dummies = {
     "$base": {
