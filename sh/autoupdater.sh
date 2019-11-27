@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Starting auto updater script"
 
 PYVER=python3.7
