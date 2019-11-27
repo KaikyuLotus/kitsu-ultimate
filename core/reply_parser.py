@@ -196,6 +196,7 @@ def execute(reply: str, infos, markup=None):
 
     log.d("Sending message")
     return methods.send_message(infos.bot.token, infos.chat.cid, reply,
+                                reply_to_message_id=infos.message.message_id if quote else None,
                                 parse_mode="markdown" if markdown else None,
                                 reply_markup=markup,
                                 disable_web_page_preview=nolink)
