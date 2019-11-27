@@ -6,12 +6,12 @@ PIPVER=pip3
 # Some preconditions first
 set -e
 $PYVER --version
-$PIPVER install -r requirements.txt 2>&1
+$PIPVER -q install -r requirements.txt
 echo "Tools ok!"
 
 # Prepare...
 pkill python || echo "Python was not running."
-git pull 2>&1
+git pull
 echo "All ok!"
 echo "Starting loop..."
 
