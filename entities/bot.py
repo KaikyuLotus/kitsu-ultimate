@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import traceback
 
@@ -139,7 +140,7 @@ class Bot:
         except BadRequest as e:
             log.w(f"Warning, telegram said: {e.message}")
         except Exception as e:
-            log.e(str(e))
+            log.e('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
             traceback.print_tb(e.__traceback__)
             if last_update:
                 pprint(last_update)
