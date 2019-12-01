@@ -1,7 +1,7 @@
 import importlib
 import traceback
 
-from typing import Type
+from typing import Type, List
 
 from configuration.config import config
 from core import manager, variables
@@ -20,8 +20,9 @@ from utils.bot_utils import is_bot_token
 _main_bot = None
 
 _overrideable_module_function = [
-    ModuleFunction("load_dummies", dict, True)
-    # ModuleFunction("load_dummies", dict, False)
+    ModuleFunction("load_dummies", dict, True),
+    ModuleFunction("on_new_trigger", bool, True),
+    ModuleFunction("on_trigger_change", bool, True)
 ]
 
 
@@ -125,7 +126,7 @@ def attach_bots(tokens: list):
                 log.w(f"Invalid token {token} skipping.")
 
 
-def get_attached_bots():
+def get_attached_bots() -> List[Bot]:
     return variables.attached_bots
 
 
@@ -163,6 +164,15 @@ def _elab_module_fun(function, instance, Module):
         if not function.optional:
             log.w(f"{Module.__name__}.{function.name} is not a function")
         return function.optional
+
+    if function.name == "on_new_trigger":
+        variables.on_new_trigger_functions.append(real_function)
+        log.i("Registered callback")
+        return True
+    if function.name == "on_trigger_change":
+        variables.on_trigger_change_functions.append(real_function)
+        log.i("Registered callback")
+        return True
 
     return_value = real_function()
     if type(return_value) is not function.type:
