@@ -129,7 +129,7 @@ def parse_sections(reply: str, infos) -> str:
 
 def elaborate_multx(reply: str, infos):
     last_msg_id = None
-    for action, var in re.findall(r"(send|action|wait|edit):(?:(.+?)(?: then|]))", reply):
+    for action, var in re.findall(r"(send|action|wait|edit):(?:(.+?)(?: then|]))", reply, re.DOTALL):
         # TODO this can cause loops
         log.d(f"Action: {action}, var: {var}")
         if action == "send" or action == "edit":
@@ -162,7 +162,7 @@ def elaborate_multx(reply: str, infos):
 
 
 def execute(reply: str, infos, markup=None):
-    if re.search(r"^\[.+]$", reply, re.MULTILINE):
+    if re.search(r"^\[.+]$", reply, re.DOTALL):
         threading.Thread(target=elaborate_multx, args=(reply, infos)).start()
         return
 
