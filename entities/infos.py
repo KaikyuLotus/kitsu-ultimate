@@ -50,6 +50,8 @@ class Infos:
             self.update_type = "callback"
         elif self.is_channel_post:
             self.update_type = "channel_post"
+            self.message = Message(update["channel_post"], bot)
+            self.chat = Chat(update["channel_post"]["chat"])
         elif self.is_edited_message:
             self.update_type = "edited_message"
         elif self.is_edited_channel_post:
@@ -68,7 +70,8 @@ class Infos:
             quoted = self.to_user.uid
 
         self.db = DB(self.bot.bot_id, gid, uid, quoted, self.chat.is_private if self.chat else False)
-        self.is_to_bot = (self.is_reply and self.to_user.is_this_bot if self.to_user else False) or self.chat.is_private
+        self.is_to_bot = (self.is_reply and self.to_user.is_this_bot if self.to_user else False) \
+                         or self.chat.is_private if self.chat else False
 
     def _load_callback_query(self, update):
         self.callback_query = CallbackQuery(update["callback_query"], self.bot)
@@ -352,8 +355,10 @@ class DB:
 
         if is_private:
             self.language = self.user.language
-        else:
+        elif self.group:
             self.language = self.group.language
+        else:
+            self.language = "IT"
 
     def get_groups_count(self) -> int:
         return len(mongo_interface.get_bot_groups(self.bid))
