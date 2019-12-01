@@ -133,19 +133,19 @@ def elaborate_multx(reply: str, infos):
         # TODO this can cause loops
         log.d(f"Action: {action}, var: {var}")
         if action == "send" or action == "edit":
-            dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, var, infos.db.language)
-            if not dialogs:
-                log.d(f"No dialogs for section {var}")
-                continue
-            dialog = choice(dialogs)
-            log.d(f"Choosed reply {dialog.reply}")
+            # dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, var, infos.db.language)
+            # if not dialogs:
+            #     log.d(f"No dialogs for section {var}")
+            #     continue
+            # dialog = choice(dialogs)
+            # log.d(f"Choosed reply {dialog.reply}")
             if action == "send":
-                last_msg_id = infos.reply(dialog.reply, parse_mode=None)["message_id"]
+                last_msg_id = infos.reply(var, parse_mode=None)["message_id"]
             else:
                 if not last_msg_id:
                     log.w("This action has not sent a message before, so there's nothing to edit.")
                     continue
-                infos.edit(dialog.reply, parse_mode=None, msg_id=last_msg_id)
+                infos.edit(var, parse_mode=None, msg_id=last_msg_id)
         elif action == "action":
             actions = {"type": "typing"}
             if var not in actions:
