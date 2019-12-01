@@ -6,8 +6,8 @@ from utils import regex_utils
 class Trigger:
     def __init__(self, t_type: str, trigger: str, section: str, bot_id: int, lang: str, usages: int = 0):
         self.trigger: str = trigger
-        if "@" in trigger:
-            self.re_trigger: str = re.escape(trigger.split("@")[0])
+        if "\\@" in trigger:
+            self.re_trigger: str = re.escape(trigger.split("\\@")[0])
         else:
             self.re_trigger: str = re.escape(trigger)
         self.re_trigger = regex_utils.string_to_regex(self.re_trigger)
