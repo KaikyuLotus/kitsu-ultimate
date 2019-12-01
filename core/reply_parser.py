@@ -162,7 +162,7 @@ def elaborate_multx(reply: str, infos):
 
 
 def execute(reply: str, infos, markup=None):
-    if re.search(r"^\[.+]$", reply):
+    if re.search(r"^\[.+]$", reply, re.MULTILINE):
         threading.Thread(target=elaborate_multx, args=(reply, infos)).start()
         return
 
