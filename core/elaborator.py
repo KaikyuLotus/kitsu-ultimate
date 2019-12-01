@@ -132,8 +132,8 @@ def elaborate(infos: Infos):
                                                         t_type_elaborator,
                                                         infos.db.language)
         for trigger in triggers:
-            if "@" in trigger.trigger:
-                trigger.trigger, identifier = trigger.trigger.split("@")
+            if "\\@" in trigger.trigger:
+                trigger.trigger, identifier = trigger.trigger.split("\\@")
                 if identifier.lower() == "owner":
                     identifier = str(infos.bot.owner_id)
                 if identifier.isnumeric():
