@@ -236,7 +236,7 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, L
         reply = reply.replace("[quote]", "")
         reply = reply.replace("[nolink]", "")
 
-        if "[spongebob]" == reply:
+        if "<spongebob>" == reply:
             reply = to_spongebob_case(infos.message.text)
         else:
             reply = parse_sections(reply, infos)
@@ -257,4 +257,4 @@ def reply_choice(dialogs: List[Dialog]):
 
 
 def to_spongebob_case(message: str):
-    return "".join([c.upper() if c % 2 == 0 else c.lower() for i, c in enumerate(message)])
+    return "".join([c.upper() if i % 2 == 0 else c.lower() for i, c in enumerate(message)])
