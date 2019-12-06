@@ -236,12 +236,15 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, L
         reply = reply.replace("[quote]", "")
         reply = reply.replace("[nolink]", "")
 
-        reply = parse_sections(reply, infos)
-        reply = parse_dummies(reply, infos)
-        reply = parse_str_dummies(reply, infos)
-        reply = parse_rnd(reply)
+        if "[spongebob]" == reply:
+            reply = to_spongebob_case(infos.message)
+        else:
+            reply = parse_sections(reply, infos)
+            reply = parse_dummies(reply, infos)
+            reply = parse_str_dummies(reply, infos)
+            reply = parse_rnd(reply)
 
-        reply, mkup = parse_buttons(reply)
+            reply, mkup = parse_buttons(reply)
 
     return reply, quote, nolink, markdown, mkup
 
@@ -251,3 +254,7 @@ def reply_choice(dialogs: List[Dialog]):
         dialog = choice(dialogs)
         if random.randint(1, 100) <= dialog.probability:
             return dialog
+
+
+def to_spongebob_case(message: str):
+    return "".join([c.upper() if c % 2 == 0 else c.lower() for i, c in enumerate(message)])
