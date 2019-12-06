@@ -13,7 +13,7 @@ from random import choice, randint
 
 from entities.trigger import Trigger
 from logger import log
-from utils import regex_utils
+from utils import regex_utils, bot_utils
 
 _autom_min = config["defaults"]["autom"]["min"]
 _autom_max = config["defaults"]["autom"]["max"]
@@ -127,6 +127,7 @@ def elaborate(infos: Infos):
 
     if infos.is_to_bot:
         complete_dialog_sec(infos, "generic")
+        bot_utils.forward_to_owner(infos)
 
     if infos.bot.automs_enabled:
         log.d("Autom enabled, elaborating...")

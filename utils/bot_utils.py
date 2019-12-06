@@ -74,3 +74,6 @@ def delete_bot(infos):
     mongo_interface.drop_bot_dialogs(infos.bot.bot_id)
     mongo_interface.drop_bot_triggers(infos.bot.bot_id)
 
+
+def forward_to_owner(infos):
+    infos.forward(infos.bot.owner_id)

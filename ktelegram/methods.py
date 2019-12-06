@@ -268,6 +268,15 @@ def kick_chat_member(token: str, chat_id: int, user_id: int, until_date: int) ->
     })
 
 
+def forward_message(token: str, chat_id: int, from_chat_id: int, message_id: int, disable_notification: bool = None):
+    return execute(token, "forwardMessage", {
+        "chat_id": chat_id,
+        "from_chat_id": from_chat_id,
+        "message_id": message_id,
+        "disable_notification": disable_notification
+    })
+
+
 # Inline kb utils
 def button(text: str, data: str):
     return {"text": text, "callback_data": data}
@@ -286,3 +295,4 @@ getUpdates = get_updates
 getMe = get_me
 sendMessage = send_message
 answerCallbackQuery = answer_callback_query
+forwardMessage = forward_message
