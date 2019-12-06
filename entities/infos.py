@@ -151,6 +151,9 @@ class Infos:
         methods.delete_message(self.bot.token, chat_id=chat_id,
                                message_id=message_id)
 
+    def forward(self, chat_id: int, no_notify=True):
+        methods.forward_message(self.bot.token, chat_id, self.chat.cid, self.message.message_id, True)
+
 
 class CallbackQuery:
     def __init__(self, callback_query, bot):
