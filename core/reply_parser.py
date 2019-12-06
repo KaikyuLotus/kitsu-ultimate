@@ -257,4 +257,4 @@ def reply_choice(dialogs: List[Dialog]):
 
 
 def to_spongebob_case(message: str):
-    return "".join([c.upper() if i % 2 == 0 else c.lower() for i, c in enumerate(message)])
+    return "".join([c.upper() if random.randint(0, 1) == 1 else c.lower() for c in message])
