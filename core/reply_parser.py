@@ -237,7 +237,7 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, L
         reply = reply.replace("[nolink]", "")
 
         if "[spongebob]" == reply:
-            reply = to_spongebob_case(infos.message)
+            reply = to_spongebob_case(infos.message.text)
         else:
             reply = parse_sections(reply, infos)
             reply = parse_dummies(reply, infos)
