@@ -26,7 +26,7 @@ def to_en(infos):
         # TODO handle better missing dialog
         return "Ok"
 
-    reply_parser.execute(choice(dialogs).reply, infos)
+    reply_parser.execute(reply_parser.reply_choice(dialogs).reply, infos)
     return ""
 
 
@@ -46,7 +46,7 @@ def to_it(infos):
         # TODO handle better missing dialog
         return "Ok"
 
-    reply_parser.execute(choice(dialogs).reply, infos)
+    reply_parser.execute(reply_parser.reply_choice(dialogs).reply, infos)
     return ""
 
 

@@ -6,6 +6,7 @@ import re
 from inspect import signature
 from random import choice
 from core.lowlevel import mongo_interface
+from entities.dialog import Dialog
 from logger import log
 from ktelegram import methods
 
@@ -57,7 +58,6 @@ dummies = {
         "<to_en>": "advanced_dummies.to_en(infos)",
         "<to_it>": "advanced_dummies.to_it(infos)"
     },
-
     "$on_reply": {
         "{quoted.name}": "infos.to_user.name",
         "{quoted.uid}": "infos.to_user.uid",
@@ -113,13 +113,13 @@ def parse_str_dummies(reply: str, infos) -> str:
 def parse_sections(reply: str, infos) -> str:
     for section in re.findall(r"\${(.*?)}", reply):
         log.d(f"Section '{section}' found")
-        dialogs = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section, infos.db.language)
+        dialogs: List[Dialog] = mongo_interface.get_dialogs_of_section(infos.bot.bot_id, section, infos.db.language)
 
         if not dialogs:
             sub = "-"
             log.d(f"No dialogs found for section '{section}'")
         else:
-            sub = choice(dialogs).reply
+            sub = reply_choice(dialogs)
 
         reply = re.sub(r"\${(.*?)}", sub, reply, count=1)
         log.d(f"Substitution of section '{section}' done")
@@ -240,6 +240,14 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, L
         reply = parse_dummies(reply, infos)
         reply = parse_str_dummies(reply, infos)
         reply = parse_rnd(reply)
+
         reply, mkup = parse_buttons(reply)
 
     return reply, quote, nolink, markdown, mkup
+
+
+def reply_choice(dialogs: List[Dialog]):
+    while True:
+        dialog = choice(dialogs)
+        if random.randint(1, 100) <= dialog.probability:
+            return dialog

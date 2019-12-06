@@ -3,6 +3,7 @@ import json
 from typing import List
 
 from configuration.config import config
+from core import reply_parser
 from core.functions import maker_functions, functions
 from core.lowlevel import mongo_interface
 from core.functions.maker_master_functions import stop
@@ -44,26 +45,7 @@ def complete_dialog_sec(infos: Infos, section: str):
         infos.bot.notify(f"No dialogs set for section {section} lang {infos.db.language}")
         return
 
-    dialog = choice(dialogs)
-
-    while dialogs:
-        dialog = choice(dialogs)
-        # Ignore 100%
-        if dialog.probability == 100:
-            break
-
-        # I wont accept a number higher than the probability
-        if randint(1, 100) > dialog.probability:
-            dialogs.remove(dialog)
-        else:
-            break  # Found!
-
-        # Reset and retry
-        dialog = None
-
-    if not dialog:
-        log.d("All dialogs where ignored")
-        return
+    dialog = reply_parser.reply_choice(dialogs)
 
     infos.reply(dialog.reply, parse_mode=None)
     mongo_interface.increment_dialog_usages(dialog)
