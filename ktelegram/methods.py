@@ -1,8 +1,7 @@
 import json
 from json import JSONDecodeError
 
-import requests
-from requests import post
+from requests import Session, Timeout
 
 from entities.file import File
 from exceptions.conflict import Conflict
@@ -15,15 +14,24 @@ from exceptions.unauthorized import Unauthorized
 from logger import log
 
 _base_url = "https://api.telegram.org"
+_timeout = 121
+_session = Session()
 
 
 def execute(token: str, method: str, params: dict = None, post_data: dict = None):
-    if post_data is not None:
-        log.d(f"POST request to {_base_url}/bot???/{method}")
-        res = requests.post(f"{_base_url}/bot{token}/{method}", params=params, files=post_data)
-    else:
-        # log.d(f"GET request to {_base_url}/bot???/{method}")
-        res = requests.get(f"{_base_url}/bot{token}/{method}", params=params)
+    try:
+        if post_data is not None:
+            log.d(f"POST request to {_base_url}/bot???/{method}")
+            res = _session.post(f"{_base_url}/bot{token}/{method}", params=params, files=post_data, timeout=_timeout)
+        else:
+            # log.d(f"GET request to {_base_url}/bot???/{method}")
+            res = _session.get(f"{_base_url}/bot{token}/{method}", params=params, timeout=_timeout)
+    except Timeout as err:
+        log.e(f"Timed out request to {_base_url}/bot???/{method}: {err}")
+        raise TelegramException(f"Timed out request to {_base_url}/bot???/{method}: {err}",
+                                "Timeout",
+                                [key for key in (params if params else [])],
+                                [params[key] for key in (params if params else [])])
 
     status_code = res.status_code
 
@@ -39,7 +47,7 @@ def execute(token: str, method: str, params: dict = None, post_data: dict = None
     except JSONDecodeError:
         args = [res.text,
                 error,
-                [key for key in params],
+                [key for key in (params if params else [])],
                 [params[key] for key in params]]
 
     if status_code == 409:
@@ -61,7 +69,7 @@ def execute(token: str, method: str, params: dict = None, post_data: dict = None
 
 
 def download(token: str, path: str):
-    response = requests.get(f"https://api.telegram.org/file/bot{token}/{path}")
+    response = _session.get(f"https://api.telegram.org/file/bot{token}/{path}", timeout=_timeout)
 
     status_code = response.status_code
 

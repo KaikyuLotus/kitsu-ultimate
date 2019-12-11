@@ -1,8 +1,11 @@
+from typing import List
+
+
 class TelegramException(Exception):
-    def __init__(self, message, description, args, values):
+    def __init__(self, message, description, args: List, values):
         self.message = message
         self.description = description
-        self.args = args
+        self.args: List = args
         self.vls = values
 
     def __str__(self):

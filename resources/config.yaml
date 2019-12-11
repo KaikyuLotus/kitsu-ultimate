@@ -13,7 +13,7 @@ mongo:
 
 logging:
   level: DEBUG
-  format: '[%(levelname)-8s] - %(asctime)s - %(funcName)-20s -> %(message)s'
+  format: '[%(levelname)-8s] - %(asctime)s - %(funcName)-20s @line %(lineno)-3s: %(message)s'
   date-format: '%H:%M:%S'
   file-name: resources/log.txt
 
