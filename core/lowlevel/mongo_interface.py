@@ -6,6 +6,7 @@ from threading import Lock
 
 from pymongo.collection import Collection
 
+from core import variables
 from entities.dialog import Dialog
 from entities.group import Group
 from entities.stats import Stats
@@ -25,7 +26,7 @@ _username = config["mongo"]["username"]
 _ip = config["mongo"]["ip"]
 _db_name = config["mongo"]["db-name"]
 
-_mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=true"
+_mongo_uri = f"mongodb://{_username}:{_password}@{_ip}/{_db_name}?retryWrites=true&authSource=admin"
 
 _client = None
 _singleton_lock = Lock()
@@ -139,6 +140,8 @@ def get_stats(bot_id: int) -> Stats:
 # TODO clean DB and remove compatibility if
 def increment_trigger_usages(trigger: Trigger):
     update_trigger(trigger, {"$inc": {"usages": 1}})
+    for callback in variables.on_trigger_change_functions:
+        callback(trigger)
 
 
 def increment_dialog_usages(dialog: Dialog):
@@ -238,10 +241,22 @@ def drop_bot_dialogs(bot_id: int):
 
 
 # TODO post-debug refactoring
-def add_trigger(trigger: Trigger): _get_db().triggers.insert_one(dict(trigger))
+def add_trigger(trigger: Trigger):
+    _get_db().triggers.insert_one(dict(trigger))
+    for callback in variables.on_new_trigger_functions:
+        callback(trigger)
+    for callback in variables.on_trigger_change_functions:
+        callback(trigger)
 
 
-def add_triggers(triggers: List[Trigger]): _get_db().triggers.insert_many([dict(trigger) for trigger in triggers])
+def add_triggers(triggers: List[Trigger]):
+    _get_db().triggers.insert_many([dict(trigger) for trigger in triggers])
+    for callback in variables.on_new_trigger_functions:
+        for trigger in triggers:
+            callback(trigger)
+    for callback in variables.on_trigger_change_functions:
+        for trigger in triggers:
+            callback(trigger)
 
 
 def add_dialog(dialog: Dialog): _get_db().dialogs.insert_one(dict(dialog))
@@ -260,10 +275,14 @@ def update_dialog(old_dialog: Dialog, new_dialog: Union[Dialog, dict]):
 
 def replace_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
     _get_db().triggers.replace_one(dict(old_trigger), dict(new_trigger))
+    for callback in variables.on_trigger_change_functions:
+        callback(new_trigger)
 
 
 def update_trigger(old_trigger: Trigger, new_trigger: Union[Trigger, dict]):
     _get_db().triggers.update_one(dict(old_trigger), dict(new_trigger))
+    for callback in variables.on_trigger_change_functions:
+        callback(new_trigger)
 
 
 def drop_bot_triggers(bot_id: int):
@@ -281,7 +300,10 @@ def delete_dialogs_of_section(bot_id: int, section: str, language=_default_langu
     })
 
 
-def delete_trigger(trigger: Trigger): _get_db().triggers.delete_one(dict(trigger))
+def delete_trigger(trigger: Trigger):
+    _get_db().triggers.delete_one(dict(trigger))
+    for callback in variables.on_trigger_change_functions:
+        callback(trigger)
 
 
 def delete_triggers_of_section(bot_id: int, section: str, language=_default_language):

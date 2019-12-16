@@ -23,4 +23,6 @@ media_types = {
 }
 
 attached_bots = []
+on_new_trigger_functions = []
+on_trigger_change_functions = []
 running = False

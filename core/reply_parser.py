@@ -226,15 +226,7 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, L
     quote = False
     nolink = False
 
-    markdown = "[md]" in reply
-    reply = reply.replace("[md]", "", 1)
-
     if not only_formatting:
-        quote = "[quote]" in reply
-        nolink = "[nolink]" in reply
-
-        reply = reply.replace("[quote]", "")
-        reply = reply.replace("[nolink]", "")
 
         if "<spongebob>" == reply:
             reply = to_spongebob_case(infos.message.text)
@@ -245,6 +237,15 @@ def parse(reply: str, infos, only_formatting=False) -> (str, bool, bool, bool, L
             reply = parse_rnd(reply)
 
             reply, mkup = parse_buttons(reply)
+
+        quote = "[quote]" in reply
+        nolink = "[nolink]" in reply
+
+        reply = reply.replace("[quote]", "")
+        reply = reply.replace("[nolink]", "")
+
+    markdown = "[md]" in reply
+    reply = reply.replace("[md]", "", 1)
 
     return reply, quote, nolink, markdown, mkup
 

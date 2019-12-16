@@ -3,7 +3,7 @@
 
 lotus:
   codename: 'BLACK FLOWER'
-  version: '0.8.4-SNAPSHOT'
+  version: '0.8.5-SNAPSHOT'
 
 mongo:
   username: kaikyu
@@ -19,17 +19,23 @@ logging:
 
 startup:
   drop:
-    dialogs: True
-    triggers: True
-    bots: True
-    groups: True
-    users: True
+    dialogs: False
+    triggers: False
+    bots: False
+    groups: False
+    users: False
 
 modules:
   classes:
     - modules.meteo.MeteoModule
+    # - modules.trigger_helper.TriggerHelperModule
   meteo:
     enabled: True
+  trigger-helper:
+    enabled: True
+    channel-id: -1001162520316
+    msg-id: 12
+
 
 defaults:
   language: IT
@@ -45,3 +51,6 @@ defaults:
 
 kitsu:
   backup-password: idk
+
+meteo:
+  appid: e296ee57588fc63608c11bfcf2858afa

@@ -49,6 +49,7 @@ class Infos:
             self.user = self.callback_query.user
             self.update_type = "callback"
         elif self.is_channel_post:
+            print(update)
             self.update_type = "channel_post"
             self.message = Message(update["channel_post"], bot)
             self.chat = Chat(update["channel_post"]["chat"])

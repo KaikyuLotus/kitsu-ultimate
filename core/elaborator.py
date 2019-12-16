@@ -113,6 +113,9 @@ def elaborate(infos: Infos):
         triggers = mongo_interface.get_triggers_of_type(infos.bot.bot_id,
                                                         t_type_elaborator,
                                                         infos.db.language)
+
+        triggers.sort(key=lambda trig: len(trig.trigger), reverse=True)
+
         for trigger in triggers:
             if "\\@" in trigger.trigger:
                 trigger.trigger, identifier = trigger.trigger.split("\\@")

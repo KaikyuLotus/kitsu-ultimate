@@ -3,26 +3,35 @@ import re
 from entities.infos import Infos
 from configuration.config import config
 
-gex = re.compile("meteo city: (.+)", re.I)
+from extras.meteo import openweathermap
 
 
 def meteo_reg(infos: Infos):
-    msg: str = infos.message.text
-    msg = msg.replace(infos.bot.name.split()[0], "").strip()
-    res = re.search(gex, msg)
+    res = re.search(".*meteo (?:per|for) (.+)", infos.message.text, re.I)
     if res:
-        city = res.group(1)
-        infos.db.user.extra["city"] = city
-        infos.db.update_user()
-        return f"Registered '{city}' as meteo city!"
+        city = res.group(1).capitalize()
+        if openweathermap.get_meteo(city, infos.user.language_code.capitalize()).status_code == 200:
+            infos.db.user.extra["city"] = city.capitalize()
+            infos.db.update_user()
+            return f"'{city}' registrata!"
+        else:
+            return "Questa città probabilmente non esiste..."
     return "What...?"
 
 
 def meteo_req(infos: Infos):
     city = infos.db.user.extra.get("city", None)
     if not city:
-        return "Use 'meteo: city' to register!"
-    return f"Meteo for '{city}':\nVai su Google e vedi no?!-"
+        return "Dimmi 'meteo per città' per registrare una città!"
+    meteo = openweathermap.get_meteo(city, infos.user.language_code.lower())
+    if meteo.status_code == 200:
+        data = openweathermap.extract_data(meteo.json())
+        return f"[md]Meteo per *{city}*:\n" \
+               f"Stato: *{data.description}*\n" \
+               f"Temperatura: *{data.current_temp}*\n" \
+               f"Percepita: *{data.feel_temp}*"
+    else:
+        return f"Qualcosa è andato storto..."
 
 
 class MeteoModule:
