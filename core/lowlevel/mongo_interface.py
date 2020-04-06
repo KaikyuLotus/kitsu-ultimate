@@ -70,7 +70,7 @@ def drop_bots(): _get_bots_collection().drop()
 
 
 def get_user_bots(user_id: int):
-    return list(_get_bots_collection().find({"owner_id": {user_id}}))
+    return list(_get_bots_collection().find({"owner_id": user_id}))
 
 
 def update_bot(token: str, bot):
