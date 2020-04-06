@@ -21,11 +21,10 @@ def newbot(infos: Infos):
         return infos.reply("{user.name} i think that this isn't a valid token...")
 
     infos.reply("Creating a new bot with this token...")
-    try:
-        mongo_interface.register_bot(infos.message.text, infos.user.uid)
+    ok = mongo_interface.register_bot(infos.message.text, infos.user.uid)
+    if ok:
         infos.reply("Valid token! Your bot should be online now!")
-    except Exception as e:
-        print(str(e))  # TODO better error handling
+    else:
         infos.reply("Something went wrong while registering the new bot...")
 
 
