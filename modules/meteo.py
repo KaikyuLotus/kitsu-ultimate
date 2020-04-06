@@ -22,7 +22,7 @@ def meteo_req(infos: Infos):
     city = infos.db.user.extra.get("city", None)
     if not city:
         return "Use 'meteo: city' to register!"
-    return f"Meteo for '{city}':\nVai su Google e vedi no?!-"
+    return f"Meteo for '{city}':\nVai su Google e vedi no?!!-"
 
 
 class MeteoModule:
